@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.iou.flow.IOUFlow;
 import com.iou.state.IOUState;
 import net.corda.core.crypto.CryptoUtilities;
-import net.corda.core.crypto.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
@@ -13,19 +12,15 @@ import org.junit.Test;
 
 public class IOUFlowTests {
     private MockNetwork net;
-    private Party notary;
     private MockNetwork.MockNode a;
     private MockNetwork.MockNode b;
-    private MockNetwork.MockNode c;
 
     @Before
     public void setup() {
         net = new MockNetwork();
-        MockNetwork.BasketOfNodes nodes = net.createSomeNodes(3);
-        notary = nodes.getNotaryNode().info.getNotaryIdentity();
+        MockNetwork.BasketOfNodes nodes = net.createSomeNodes(2);
         a = nodes.getPartyNodes().get(0);
         b = nodes.getPartyNodes().get(1);
-        c = nodes.getPartyNodes().get(2);
         net.runNetwork();
     }
 
@@ -105,40 +100,6 @@ public class IOUFlowTests {
 //    }
 
 //    @Test
-//    public void flowRejectsIOUsThatAreNotSignedByTheSender() throws InterruptedException {
-//        IOUState state = new IOUState(
-//                1,
-//                c.info.getLegalIdentity(),
-//                b.info.getLegalIdentity(),
-//                new IOUContract());
-//        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
-//        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
-//
-//        try {
-//            future.get();
-//            fail("Expecting flow result to throw an exception");
-//        } catch (ExecutionException e) {}
-//    }
-
-//    @Test
-//    public void flowRejectsIOUsThatAreNotSignedByTheRecipient() throws InterruptedException {
-//        IOUState state = new IOUState(
-//                1,
-//                a.info.getLegalIdentity(),
-//                c.info.getLegalIdentity(),
-//                new IOUContract());
-//        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
-//        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
-//
-//        try {
-//            future.get();
-//            fail("Expecting flow result to throw an exception");
-//        } catch (ExecutionException e) {}
-//    }
-
-//    @Test
 //    public void flowRecordsATransactionInBothPartiesVaults() throws Exception {
 //        IOUState state = new IOUState(
 //                1,
@@ -151,12 +112,14 @@ public class IOUFlowTests {
 //        SignedTransaction signedTx = future.get();
 //
 //        databaseTransaction(a.database, it -> {
-//            assertEquals(signedTx, a.storage.getValidatedTransactions().getTransaction(signedTx.getId()));
+//            SignedTransaction recordedTx = a.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//            assertEquals(signedTx.getId(), recordedTx.getId());
 //            return null;
 //        });
 //
 //        databaseTransaction(b.database, it -> {
-//            assertEquals(signedTx, b.storage.getValidatedTransactions().getTransaction(signedTx.getId()));
+//            SignedTransaction recordedTx = b.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//            assertEquals(signedTx.getId(), recordedTx.getId());
 //            return null;
 //        });
 //    }
