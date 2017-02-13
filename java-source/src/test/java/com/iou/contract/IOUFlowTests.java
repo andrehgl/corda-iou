@@ -3,14 +3,13 @@ package com.iou.contract;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.iou.flow.IOUFlow;
 import com.iou.state.IOUState;
+import net.corda.core.crypto.CryptoUtilities;
 import net.corda.core.crypto.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class IOUFlowTests {
     private MockNetwork net;
@@ -36,9 +35,9 @@ public class IOUFlowTests {
     }
 
     @Test
-    public void flowReturnsSignedTransactionWithNotary() throws Exception {
+    public void flowReturnsTransactionSignedByTheInitiator() throws Exception {
         IOUState state = new IOUState(
-                -1,
+                1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -46,7 +45,8 @@ public class IOUFlowTests {
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
-        assertEquals(future.get().getTx().getNotary(), notary);
+        SignedTransaction signedTx = future.get();
+        signedTx.verifySignatures(CryptoUtilities.getComposite(b.getServices().getLegalIdentityKey().getPublic()));
     }
 
 //    @Test
@@ -87,21 +87,6 @@ public class IOUFlowTests {
 //        } catch (ExecutionException e) {
 //            assertTrue(e.getCause() instanceof TransactionVerificationException.ContractRejection);
 //        }
-//    }
-
-//    @Test
-//    public void signedTransactionReturnedByTheFlowIsSignedByTheInitiator() throws Exception {
-//        IOUState state = new IOUState(
-//                1,
-//                a.info.getLegalIdentity(),
-//                b.info.getLegalIdentity(),
-//                new IOUContract());
-//        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
-//        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
-//
-//        SignedTransaction signedTx = future.get();
-//        signedTx.verifySignatures(CryptoUtilities.getComposite(b.getServices().getLegalIdentityKey().getPublic()));
 //    }
 
 //    @Test
