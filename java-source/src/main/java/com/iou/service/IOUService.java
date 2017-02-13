@@ -1,6 +1,6 @@
-package com.example.service;
+package com.iou.service;
 
-import com.example.flow.IOUFlow;
+import com.iou.flow.IOUFlow;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 

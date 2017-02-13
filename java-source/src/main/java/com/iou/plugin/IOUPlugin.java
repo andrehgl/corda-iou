@@ -1,11 +1,11 @@
-package com.example.plugin;
+package com.iou.plugin;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.example.api.IOUApi;
-import com.example.contract.IOUContract;
-import com.example.flow.IOUFlow;
-import com.example.service.IOUService;
-import com.example.state.IOUState;
+import com.iou.api.IOUApi;
+import com.iou.contract.IOUContract;
+import com.iou.flow.IOUFlow;
+import com.iou.service.IOUService;
+import com.iou.state.IOUState;
 import net.corda.core.contracts.AuthenticatedObject;
 import net.corda.core.contracts.Timestamp;
 import net.corda.core.contracts.TransactionType;

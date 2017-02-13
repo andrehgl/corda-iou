@@ -1,4 +1,4 @@
-package com.example;
+package com.iou;
 
 import net.corda.core.node.services.ServiceInfo;
 import net.corda.node.driver.NodeHandle;
