@@ -132,9 +132,3 @@ task generateFlowDiagram(type: JavaExec) {
             "../doc/*.plantuml"
     ]
 }
-
-task runExampleClientRPC(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'com.example.client.ExampleClientRPC'
-    args 'localhost:10004'
-}

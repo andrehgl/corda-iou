@@ -15,7 +15,6 @@ import net.corda.core.flows.FlowLogic;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.transactions.WireTransaction;
-import net.corda.core.utilities.ProgressTracker;
 import net.corda.flows.FinalityFlow;
 
 import java.security.KeyPair;
@@ -41,33 +40,9 @@ public class IOUFlow {
         private final IOUState iou;
         private final Party otherParty;
 
-        // The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
-        // checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call()
-        // function.
-        private final ProgressTracker progressTracker = new ProgressTracker(
-                GENERATING_TRANSACTION,
-                VERIFYING_TRANSACTION,
-                SIGNING_TRANSACTION,
-                SENDING_TRANSACTION
-        );
-
-        private static final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step(
-                "Generating transaction based on new IOU.");
-        private static final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step(
-                "Verifying contract constraints.");
-        private static final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step(
-                "Signing transaction with our private key.");
-        private static final ProgressTracker.Step SENDING_TRANSACTION = new ProgressTracker.Step(
-                "Sending proposed transaction to seller for review.");
-
         public Initiator(IOUState iou, Party otherParty) {
             this.iou = iou;
             this.otherParty = otherParty;
-        }
-
-        @Override
-        public ProgressTracker getProgressTracker() {
-            return progressTracker;
         }
 
         /**
@@ -84,24 +59,17 @@ public class IOUFlow {
             // Obtain a reference to the notary we want to use.
             final Party notary = single(getServiceHub().getNetworkMapCache().getNotaryNodes()).getNotaryIdentity();
 
-            // Stage 1.
-            progressTracker.setCurrentStep(GENERATING_TRANSACTION);
-            // Generate an unsigned transaction.
+            // Stage 1 - Generating an unsigned transaction
             final Command txCommand = new Command(new IOUContract.Commands.Create(), iou.getParticipants());
             final TransactionBuilder unsignedTx = new TransactionType.General.Builder(notary).withItems(iou, txCommand);
 
-            // Stage 2.
-            progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
-            // Verify that the transaction is valid.
+            // Stage 2 - Verifying that the transaction is valid
             unsignedTx.toWireTransaction().toLedgerTransaction(getServiceHub()).verify();
 
-            // Stage 3.
-            progressTracker.setCurrentStep(SIGNING_TRANSACTION);
+            // Stage 3 - Signing the transaction
             final SignedTransaction partSignedTx = unsignedTx.signWith(keyPair).toSignedTransaction(false);
     
-            // Stage 4.
-            progressTracker.setCurrentStep(SENDING_TRANSACTION);
-            // Send the state across the wire to the designated counterparty.
+            // Stage 4 - Sending the transaction to the counterparty
             // -----------------------
             // Flow jumps to Acceptor.
             // -----------------------
@@ -114,29 +82,9 @@ public class IOUFlow {
     public static class Acceptor extends FlowLogic<Void> {
 
         private final Party otherParty;
-        private final ProgressTracker progressTracker = new ProgressTracker(
-                RECEIVING_TRANSACTION,
-                VERIFYING_TRANSACTION,
-                SIGNING_TRANSACTION,
-                FINALISING_TRANSACTION
-        );
-
-        private static final ProgressTracker.Step RECEIVING_TRANSACTION = new ProgressTracker.Step(
-                "Receiving proposed transaction from buyer.");
-        private static final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step(
-                "Verifying signatures and contract constraints.");
-        private static final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step(
-                "Signing proposed transaction with our private key.");
-        private static final ProgressTracker.Step FINALISING_TRANSACTION = new ProgressTracker.Step(
-                "Obtaining notary signature and recording transaction.");
 
         public Acceptor(Party otherParty) {
             this.otherParty = otherParty;
-        }
-
-        @Override
-        public ProgressTracker getProgressTracker() {
-            return progressTracker;
         }
 
         @Suspendable
@@ -149,16 +97,14 @@ public class IOUFlow {
             // Obtain a reference to the notary we want to use and its public key.
             final CompositeKey notaryPubKey = notary.getOwningKey();
 
-            // Stage 5.
-            progressTracker.setCurrentStep(RECEIVING_TRANSACTION);
+            // Stage 5 - Receiving the transaction
             // All messages come off the wire as UntrustworthyData. You need to 'unwrap' them. This is where you
             // validate what you have just received.
 
             final SignedTransaction partSignedTx = receive(SignedTransaction.class, otherParty)
                     .unwrap(tx ->
                     {
-                        // Stage 6.
-                        progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
+                        // Stage 6 - Checking the transaction
                         try {
                             // Check that the signature of the other party is valid.
                             // Our signature and the notary's signature are allowed to be omitted at this stage as
@@ -175,17 +121,14 @@ public class IOUFlow {
                         return tx;
                     });
 
-            // Stage 7.
-            progressTracker.setCurrentStep(SIGNING_TRANSACTION);
+            // Stage 7 - Signing the transaction
             // Sign the transaction with our key pair and add it to the transaction.
-            // We now have 'validation consensus'. We still require uniqueness consensus.
-            // Technically validation consensus for this type of agreement implicitly provides uniqueness consensus.
+            // We now have 'validation consensus', but we still need uniqueness consensus (i.e. notarisation).
             final DigitalSignature.WithKey mySig = partSignedTx.signWithECDSA(keyPair);
             // Add our signature to the transaction.
             final SignedTransaction signedTx = partSignedTx.plus(mySig);
 
-            // Stage 8.
-            progressTracker.setCurrentStep(FINALISING_TRANSACTION);
+            // Stage 8 - Finalizing the transaction
             final Set<Party> participants = ImmutableSet.of(getServiceHub().getMyInfo().getLegalIdentity(), otherParty);
             // FinalityFlow() notarises the transaction and records it in each party's vault.
             subFlow(new FinalityFlow(signedTx, participants));

@@ -3,7 +3,6 @@ package com.example.api;
 import com.example.contract.IOUContract;
 import com.example.flow.IOUFlow;
 import com.example.state.IOUState;
-import com.google.common.collect.Lists;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.Party;
@@ -16,49 +15,17 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.toList;
 
 // This API is accessible from /api/example. All paths specified below are relative to it.
 @Path("example")
 public class IOUApi {
     private final CordaRPCOps services;
-    private final String myLegalName;
-    private final List<String> notaryNames = Lists.newArrayList("Controller", "NetworkMapService");
 
     static private final Logger logger = LoggerFactory.getLogger(IOUApi.class);
 
     public IOUApi(CordaRPCOps services) {
         this.services = services;
-        this.myLegalName = services.nodeIdentity().getLegalIdentity().getName();
-    }
-
-    /**
-     * Returns the node's name.
-     */
-    @GET
-    @Path("me")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> whoami() { return singletonMap("me", myLegalName); }
-
-    /**
-     * Returns all parties registered with the [NetworkMapService]. These names can be used to look up identities
-     * using the [IdentityService].
-     */
-    @GET
-    @Path("peers")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, List<String>> getPeers() {
-        return singletonMap(
-                "peers",
-                services.networkMapUpdates().getFirst()
-                        .stream()
-                        .map(node -> node.getLegalIdentity().getName())
-                        .filter(name -> !name.equals(myLegalName) && !(notaryNames.contains(name)))
-                        .collect(toList()));
     }
 
     /**
