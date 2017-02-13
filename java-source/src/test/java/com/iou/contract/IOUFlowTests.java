@@ -1,11 +1,20 @@
 package com.iou.contract;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.iou.flow.IOUFlow;
+import com.iou.state.IOUState;
+import net.corda.core.crypto.Party;
+import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class IOUFlowTests {
     private MockNetwork net;
+    private Party notary;
     private MockNetwork.MockNode a;
     private MockNetwork.MockNode b;
     private MockNetwork.MockNode c;
@@ -14,6 +23,7 @@ public class IOUFlowTests {
     public void setup() {
         net = new MockNetwork();
         MockNetwork.BasketOfNodes nodes = net.createSomeNodes(3);
+        notary = nodes.getNotaryNode().info.getNotaryIdentity();
         a = nodes.getPartyNodes().get(0);
         b = nodes.getPartyNodes().get(1);
         c = nodes.getPartyNodes().get(2);
@@ -23,6 +33,20 @@ public class IOUFlowTests {
     @After
     public void tearDown() {
         net.stopNodes();
+    }
+
+    @Test
+    public void flowReturnsSignedTransactionWithNotary() throws Exception {
+        IOUState state = new IOUState(
+                -1,
+                a.info.getLegalIdentity(),
+                b.info.getLegalIdentity(),
+                new IOUContract());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
+        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
+        net.runNetwork();
+
+        assertEquals(future.get().getTx().getNotary(), notary);
     }
 
 //    @Test
