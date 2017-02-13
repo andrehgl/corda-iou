@@ -48,8 +48,12 @@ public class IOUApi {
      * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
      */
     @PUT
-    @Path("{party}/create-iou")
-    public Response createIOU(Integer iouValue, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
+    @Path("create-iou")
+    public Response createIOU(
+            @QueryParam(value = "value") final Integer iouValue,
+            @QueryParam(value = "party") final String partyName)
+            throws InterruptedException, ExecutionException {
+
         final Party otherParty = services.partyFromName(partyName);
 
         if (otherParty == null) {
