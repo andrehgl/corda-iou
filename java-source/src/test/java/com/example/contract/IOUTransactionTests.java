@@ -20,13 +20,13 @@ public class IOUTransactionTests {
     }
 
     @Test
-    public void transactionMustIncludeCreateCommand() {
+    public void cannotCreateNegativeValueIOUs() {
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-                txDSL.fails();
-                txDSL.command(keys, IOUContract.Commands.Create::new);
-                txDSL.verifies();
+                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
+                // Uncomment once you've added the Create command constraint.
+                // txDSL.command(keys, IOUContract.Commands.Create::new);
+                txDSL.failsWith("The IOU's value must be non-negative.");
                 return null;
             });
             return null;
@@ -39,7 +39,8 @@ public class IOUTransactionTests {
             ledgerDSL.transaction(txDSL -> {
                 txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-                txDSL.command(keys, IOUContract.Commands.Create::new);
+                // Uncomment once you've added the Create command constraint.
+                // txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
                 return null;
             });
@@ -53,8 +54,23 @@ public class IOUTransactionTests {
             ledgerDSL.transaction(txDSL -> {
                 txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-                txDSL.command(keys, IOUContract.Commands.Create::new);
+                // Uncomment once you've added the Create command constraint.
+                // txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("Only one output state should be created.");
+                return null;
+            });
+            return null;
+        });
+    }
+
+    @Test
+    public void transactionMustIncludeCreateCommand() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.fails();
+                txDSL.command(keys, IOUContract.Commands.Create::new);
+                txDSL.verifies();
                 return null;
             });
             return null;
@@ -85,34 +101,6 @@ public class IOUTransactionTests {
                 keys[0] = getMEGA_CORP_PUBKEY();
                 txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("All of the participants must be signers.");
-                return null;
-            });
-            return null;
-        });
-    }
-
-    @Test
-    public void senderIsNotRecipient() {
-        ledger(ledgerDSL -> {
-            ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(1, megaCorp, megaCorp, new IOUContract()));
-                CompositeKey[] keys = new CompositeKey[1];
-                keys[0] = getMEGA_CORP_PUBKEY();
-                txDSL.command(keys, IOUContract.Commands.Create::new);
-                txDSL.failsWith("The sender and the recipient cannot be the same entity.");
-                return null;
-            });
-            return null;
-        });
-    }
-
-    @Test
-    public void cannotCreateNegativeValueIOUs() {
-        ledger(ledgerDSL -> {
-            ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
-                txDSL.command(keys, IOUContract.Commands.Create::new);
-                txDSL.failsWith("The IOU's value must be non-negative.");
                 return null;
             });
             return null;

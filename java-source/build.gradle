@@ -93,16 +93,6 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['build']) {
     }
 }
 
-// TODO: Make into gradle plugin without any references to Jython
-task installJythonDeps(dependsOn: ['build']) {
-    project.copy {
-        from project.configurations.runtime
-        into "build/jythonDeps"
-    }
-}
-
-installJythonDeps.shouldRunAfter build
-
 idea {
     module {
         downloadJavadoc = true // defaults to false
@@ -120,15 +110,4 @@ publishing {
             artifact javadocJar
         }
     }
-}
-
-task generateFlowDiagram(type: JavaExec) {
-    classpath = files("build/jythonDeps/plantuml-8039.jar")
-    main = "net.sourceforge.plantuml.Run"
-    args = [
-            "-tsvg",
-            "-output", "../java-source/build/doc",
-            "-exclude", "inc_*",
-            "../doc/*.plantuml"
-    ]
 }

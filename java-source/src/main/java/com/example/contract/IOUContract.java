@@ -7,7 +7,6 @@ import net.corda.core.contracts.Contract;
 import net.corda.core.contracts.TransactionForContract;
 import net.corda.core.crypto.SecureHash;
 
-import static kotlin.collections.CollectionsKt.single;
 import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
@@ -30,22 +29,24 @@ public class IOUContract implements Contract {
      */
     @Override
     public void verify(TransactionForContract tx) {
-        final AuthenticatedObject<Commands.Create> command = requireSingleCommand(tx.getCommands(), Commands.Create.class);
         requireThat(require -> {
-            // Generic constraints around the IOU transaction.
+            // Constraint on the value of the IOU.
+            require.by("The IOU's value must be non-negative.",
+                    ((IOUState) tx.getOutputs().get(0)).getIOUValue() > 0);
+
+            // Constraints on the number of input/output states.
             require.by("No inputs should be consumed when issuing an IOU.",
                     tx.getInputs().isEmpty());
             require.by("Only one output state should be created.",
                     tx.getOutputs().size() == 1);
-            final IOUState out = (IOUState) single(tx.getOutputs());
-            require.by("The sender and the recipient cannot be the same entity.",
-                    out.getSender() != out.getRecipient());
-            require.by("All of the participants must be signers.",
-                    command.getSigners().containsAll(out.getParticipants()));
 
-            // IOU-specific constraints.
-            require.by("The IOU's value must be non-negative.",
-                    out.getIOUValue() > 0);
+            // Constraint on the presence of the Create command.
+            final AuthenticatedObject<Commands.Create> command =
+                    requireSingleCommand(tx.getCommands(), Commands.Create.class);
+
+            // Constraint on the signatories.
+            require.by("All of the participants must be signers.",
+                    command.getSigners().containsAll(tx.getOutputs().get(0).getParticipants()));
 
             return null;
         });
