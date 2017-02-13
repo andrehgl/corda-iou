@@ -1,10 +1,10 @@
 package com.example.plugin;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.example.api.ExampleApi;
+import com.example.api.IOUApi;
 import com.example.contract.IOUContract;
-import com.example.flow.ExampleFlow;
-import com.example.service.ExampleService;
+import com.example.flow.IOUFlow;
+import com.example.service.IOUService;
 import com.example.state.IOUState;
 import net.corda.core.contracts.AuthenticatedObject;
 import net.corda.core.contracts.Timestamp;
@@ -19,11 +19,11 @@ import net.corda.core.transactions.LedgerTransaction;
 import java.util.*;
 import java.util.function.Function;
 
-public class ExamplePlugin extends CordaPluginRegistry {
+public class IOUPlugin extends CordaPluginRegistry {
     /**
      * A list of classes that expose web APIs.
      */
-    private final List<Function<CordaRPCOps, ?>> webApis = Collections.singletonList(ExampleApi::new);
+    private final List<Function<CordaRPCOps, ?>> webApis = Collections.singletonList(IOUApi::new);
 
     /**
      * A list of flows required for this CorDapp. Any flow which is invoked from from the web API needs to be
@@ -39,7 +39,7 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
     private final Map<String, Set<String>> requiredFlows = Collections.singletonMap(
-            ExampleFlow.Initiator.class.getName(),
+            IOUFlow.Initiator.class.getName(),
             new HashSet<>(Arrays.asList(
                     IOUState.class.getName(),
                     Party.class.getName()
@@ -50,7 +50,7 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * factories that would be used when an initiating party attempts to communicate with our node using a particular
      * flow. See the [ExampleService.Service] class for an implementation which sets up a
      */
-    private final List<Function<PluginServiceHub, ?>> servicePlugins = Collections.singletonList(ExampleService::new);
+    private final List<Function<PluginServiceHub, ?>> servicePlugins = Collections.singletonList(IOUService::new);
 
     /**
      * A list of directories in the resources directory that will be served by Jetty under /web.

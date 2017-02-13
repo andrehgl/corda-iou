@@ -1,7 +1,7 @@
 package com.example.api;
 
 import com.example.contract.IOUContract;
-import com.example.flow.ExampleFlow;
+import com.example.flow.IOUFlow;
 import com.example.state.IOUState;
 import com.google.common.collect.Lists;
 import net.corda.core.contracts.ContractState;
@@ -24,14 +24,14 @@ import static java.util.stream.Collectors.toList;
 
 // This API is accessible from /api/example. All paths specified below are relative to it.
 @Path("example")
-public class ExampleApi {
+public class IOUApi {
     private final CordaRPCOps services;
     private final String myLegalName;
     private final List<String> notaryNames = Lists.newArrayList("Controller", "NetworkMapService");
 
-    static private final Logger logger = LoggerFactory.getLogger(ExampleApi.class);
+    static private final Logger logger = LoggerFactory.getLogger(IOUApi.class);
 
-    public ExampleApi(CordaRPCOps services) {
+    public IOUApi(CordaRPCOps services) {
         this.services = services;
         this.myLegalName = services.nodeIdentity().getLegalIdentity().getName();
     }
@@ -100,7 +100,7 @@ public class ExampleApi {
         try {
             // The line below blocks and waits for the flow to return.
             final SignedTransaction result = services
-                    .startFlowDynamic(ExampleFlow.Initiator.class, state, otherParty)
+                    .startFlowDynamic(IOUFlow.Initiator.class, state, otherParty)
                     .getReturnValue()
                     .get();
 

@@ -13,8 +13,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-// TODO: Implement QueryableState and add ORM code (to match Kotlin example).
-
 /**
  * The state object recording IOU agreements between two parties.
  *
@@ -63,9 +61,7 @@ public class IOUState implements LinearState {
         final List<PublicKey> partyKeys = Stream.of(sender, recipient)
                 .flatMap(party -> party.getOwningKey().getKeys().stream())
                 .collect(toList());
-        return ourKeys
-                .stream()
-                .anyMatch(partyKeys::contains);
+        return ourKeys.stream().anyMatch(partyKeys::contains);
 
     }
 }

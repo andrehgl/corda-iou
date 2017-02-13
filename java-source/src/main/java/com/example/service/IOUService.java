@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.flow.ExampleFlow;
+import com.example.flow.IOUFlow;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -14,11 +14,11 @@ import net.corda.core.node.PluginServiceHub;
  * In short, this bit of code is required for the recipient in this Example scenario to respond to the sender using the
  * [ExampleFlow.Acceptor] flow.
  */
-public class ExampleService {
-    public ExampleService(PluginServiceHub services) {
+public class IOUService {
+    public IOUService(PluginServiceHub services) {
         services.registerFlowInitiator(
-                JvmClassMappingKt.getKotlinClass(ExampleFlow.Initiator.class),
-                ExampleFlow.Acceptor::new
+                JvmClassMappingKt.getKotlinClass(IOUFlow.Initiator.class),
+                IOUFlow.Acceptor::new
         );
     }
 }

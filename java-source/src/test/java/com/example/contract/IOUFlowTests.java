@@ -1,6 +1,6 @@
 package com.example.contract;
 
-import com.example.flow.ExampleFlow;
+import com.example.flow.IOUFlow;
 import com.example.state.IOUState;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.corda.core.contracts.ContractState;
@@ -47,7 +47,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -67,7 +67,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 a.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -87,7 +87,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -102,7 +102,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -117,7 +117,7 @@ public class IOUFlowTests {
                 c.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -134,7 +134,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 c.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
 
@@ -151,7 +151,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(state, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
         SignedTransaction signedTx = future.get();
@@ -174,7 +174,7 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
-        ExampleFlow.Initiator flow = new ExampleFlow.Initiator(inputState, b.info.getLegalIdentity());
+        IOUFlow.Initiator flow = new IOUFlow.Initiator(inputState, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork();
         SignedTransaction signedTx = future.get();

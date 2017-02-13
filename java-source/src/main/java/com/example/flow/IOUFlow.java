@@ -4,7 +4,8 @@ import co.paralleluniverse.fibers.Suspendable;
 import com.example.contract.IOUContract;
 import com.example.state.IOUState;
 import com.google.common.collect.ImmutableSet;
-import net.corda.core.contracts.*;
+import net.corda.core.contracts.Command;
+import net.corda.core.contracts.TransactionType;
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.CryptoUtilities;
 import net.corda.core.crypto.DigitalSignature;
@@ -16,9 +17,7 @@ import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.transactions.WireTransaction;
 import net.corda.core.utilities.ProgressTracker;
 import net.corda.flows.FinalityFlow;
-import net.corda.core.contracts.AttachmentResolutionException;
 
-import java.io.FileNotFoundException;
 import java.security.KeyPair;
 import java.security.SignatureException;
 import java.util.Set;
@@ -36,7 +35,7 @@ import static kotlin.collections.CollectionsKt.single;
  * <p>
  * All methods called within the [FlowLogic] sub-class need to be annotated with the @Suspendable annotation.
  */
-public class ExampleFlow {
+public class IOUFlow {
     public static class Initiator extends FlowLogic<SignedTransaction> {
 
         private final IOUState iou;
