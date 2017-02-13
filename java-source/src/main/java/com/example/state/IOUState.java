@@ -1,7 +1,6 @@
 package com.example.state;
 
 import com.example.contract.IOUContract;
-import com.example.model.IOU;
 import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.CompositeKey;
@@ -21,31 +20,31 @@ import static java.util.stream.Collectors.toList;
  *
  * A state must implement [ContractState] or one of its descendants.
  *
- * @param iou details of the IOU.
+ * @param iouValue details of the IOU.
  * @param sender the party issuing the IOU.
  * @param recipient the party receiving and approving the IOU.
  * @param contract the contract which governs which transactions are valid for this state object.
  */
 public class IOUState implements LinearState {
-    private final IOU iou;
+    private final Integer iouValue;
     private final Party sender;
     private final Party recipient;
     private final IOUContract contract;
     private final UniqueIdentifier linearId;
 
-    public IOUState(IOU iou,
+    public IOUState(Integer iouValue,
                     Party sender,
                     Party recipient,
                     IOUContract contract)
     {
-        this.iou = iou;
+        this.iouValue = iouValue;
         this.sender = sender;
         this.recipient = recipient;
         this.contract = contract;
         this.linearId = new UniqueIdentifier();
     }
 
-    public IOU getIOU() { return iou; }
+    public Integer getIOUValue() { return iouValue; }
     public Party getSender() { return sender; }
     public Party getRecipient() { return recipient; }
     @Override public IOUContract getContract() { return contract; }

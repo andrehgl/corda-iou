@@ -2,7 +2,6 @@ package com.example.api;
 
 import com.example.contract.IOUContract;
 import com.example.flow.ExampleFlow;
-import com.example.model.IOU;
 import com.example.state.IOUState;
 import com.google.common.collect.Lists;
 import net.corda.core.contracts.ContractState;
@@ -83,7 +82,7 @@ public class ExampleApi {
      */
     @PUT
     @Path("{party}/create-iou")
-    public Response createIOU(IOU iou, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
+    public Response createIOU(Integer iouValue, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
         final Party otherParty = services.partyFromName(partyName);
 
         if (otherParty == null) {
@@ -91,7 +90,7 @@ public class ExampleApi {
         }
 
         final IOUState state = new IOUState(
-                iou,
+                iouValue,
                 services.nodeIdentity().getLegalIdentity(),
                 otherParty,
                 new IOUContract());

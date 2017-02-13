@@ -1,7 +1,6 @@
 package com.example.contract;
 
 import com.example.flow.ExampleFlow;
-import com.example.model.IOU;
 import com.example.state.IOUState;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.corda.core.contracts.ContractState;
@@ -44,7 +43,7 @@ public class IOUFlowTests {
     @Test
     public void flowRejectsInvalidIOUs() throws InterruptedException {
         IOUState state = new IOUState(
-                new IOU(-1),
+                -1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -64,7 +63,7 @@ public class IOUFlowTests {
     @Test
     public void flowRejectsInvalidIOUStates() throws InterruptedException {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 a.info.getLegalIdentity(),
                 new IOUContract());
@@ -84,7 +83,7 @@ public class IOUFlowTests {
     @Test
     public void signedTransactionReturnedByTheFlowIsSignedByTheInitiator() throws Exception {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -99,7 +98,7 @@ public class IOUFlowTests {
     @Test
     public void signedTransactionReturnedByTheFlowIsSignedByTheAcceptor() throws Exception {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -114,7 +113,7 @@ public class IOUFlowTests {
     @Test
     public void flowRejectsIOUsThatAreNotSignedByTheSender() throws InterruptedException {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 c.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -131,7 +130,7 @@ public class IOUFlowTests {
     @Test
     public void flowRejectsIOUsThatAreNotSignedByTheRecipient() throws InterruptedException {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 c.info.getLegalIdentity(),
                 new IOUContract());
@@ -148,7 +147,7 @@ public class IOUFlowTests {
     @Test
     public void flowRecordsATransactionInBothPartiesVaults() throws Exception {
         IOUState state = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -171,7 +170,7 @@ public class IOUFlowTests {
     @Test
     public void recordedTransactionHasNoInputsAndASingleOutputTheInputIOU() throws Exception {
         IOUState inputState = new IOUState(
-                new IOU(1),
+                1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
@@ -186,7 +185,7 @@ public class IOUFlowTests {
             assert(txOutputs.size() == 1);
 
             IOUState recordedState = (IOUState) txOutputs.get(0).getData();
-            assertEquals(recordedState.getIOU().getValue(), inputState.getIOU().getValue());
+            assertEquals(recordedState.getIOUValue(), inputState.getIOUValue());
             assertEquals(recordedState.getSender(), inputState.getSender());
             assertEquals(recordedState.getRecipient(), inputState.getRecipient());
             assertEquals(recordedState.getLinearId(), inputState.getLinearId());
@@ -199,7 +198,7 @@ public class IOUFlowTests {
             assert(txOutputs.size() == 1);
 
             IOUState recordedState = (IOUState) txOutputs.get(0).getData();
-            assertEquals(recordedState.getIOU().getValue(), inputState.getIOU().getValue());
+            assertEquals(recordedState.getIOUValue(), inputState.getIOUValue());
             assertEquals(recordedState.getSender(), inputState.getSender());
             assertEquals(recordedState.getRecipient(), inputState.getRecipient());
             assertEquals(recordedState.getLinearId(), inputState.getLinearId());

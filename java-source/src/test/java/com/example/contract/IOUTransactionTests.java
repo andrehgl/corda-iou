@@ -1,6 +1,5 @@
 package com.example.contract;
 
-import com.example.model.IOU;
 import com.example.state.IOUState;
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.Party;
@@ -22,10 +21,9 @@ public class IOUTransactionTests {
 
     @Test
     public void transactionMustIncludeCreateCommand() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.fails();
                 txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.verifies();
@@ -37,11 +35,10 @@ public class IOUTransactionTests {
 
     @Test
     public void transactionMustHaveNoInputs() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.input(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
                 return null;
@@ -52,11 +49,10 @@ public class IOUTransactionTests {
 
     @Test
     public void transactionMustHaveOneOutput() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("Only one output state should be created.");
                 return null;
@@ -67,10 +63,9 @@ public class IOUTransactionTests {
 
     @Test
     public void senderMustSignTransaction() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 CompositeKey[] keys = new CompositeKey[1];
                 keys[0] = getMINI_CORP_PUBKEY();
                 txDSL.command(keys, IOUContract.Commands.Create::new);
@@ -83,10 +78,9 @@ public class IOUTransactionTests {
 
     @Test
     public void recipientMustSignTransaction() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
                 CompositeKey[] keys = new CompositeKey[1];
                 keys[0] = getMEGA_CORP_PUBKEY();
                 txDSL.command(keys, IOUContract.Commands.Create::new);
@@ -99,10 +93,9 @@ public class IOUTransactionTests {
 
     @Test
     public void senderIsNotRecipient() {
-        IOU iou = new IOU(1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, megaCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, megaCorp, megaCorp, new IOUContract()));
                 CompositeKey[] keys = new CompositeKey[1];
                 keys[0] = getMEGA_CORP_PUBKEY();
                 txDSL.command(keys, IOUContract.Commands.Create::new);
@@ -115,10 +108,9 @@ public class IOUTransactionTests {
 
     @Test
     public void cannotCreateNegativeValueIOUs() {
-        IOU iou = new IOU(-1);
         ledger(ledgerDSL -> {
             ledgerDSL.transaction(txDSL -> {
-                txDSL.output(new IOUState(iou, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
                 txDSL.command(keys, IOUContract.Commands.Create::new);
                 txDSL.failsWith("The IOU's value must be non-negative.");
                 return null;

@@ -4,7 +4,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.example.api.ExampleApi;
 import com.example.contract.IOUContract;
 import com.example.flow.ExampleFlow;
-import com.example.model.IOU;
 import com.example.service.ExampleService;
 import com.example.state.IOUState;
 import net.corda.core.contracts.AuthenticatedObject;
@@ -56,10 +55,7 @@ public class ExamplePlugin extends CordaPluginRegistry {
     /**
      * A list of directories in the resources directory that will be served by Jetty under /web.
      */
-    private final Map<String, String> staticServeDirs = Collections.singletonMap(
-            // This will serve the exampleWeb directory in resources to /web/example
-            "example", getClass().getClassLoader().getResource("exampleWeb").toExternalForm()
-    );
+    private final Map<String, String> staticServeDirs = Collections.emptyMap();
 
     @Override public List<Function<CordaRPCOps, ?>> getWebApis() { return webApis; }
     @Override public Map<String, Set<String>> getRequiredFlows() { return requiredFlows; }
@@ -72,7 +68,6 @@ public class ExamplePlugin extends CordaPluginRegistry {
     @Override public boolean registerRPCKryoTypes(Kryo kryo) {
         kryo.register(IOUState.class);
         kryo.register(IOUContract.class);
-        kryo.register(IOU.class);
         kryo.register(TransactionVerificationException.ContractRejection.class);
         kryo.register(LedgerTransaction.class);
         kryo.register(AuthenticatedObject.class);
