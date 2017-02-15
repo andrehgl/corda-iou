@@ -1,4 +1,4 @@
-package com.iou.contract;
+package com.iou;
 
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.Party;
