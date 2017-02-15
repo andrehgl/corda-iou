@@ -1,21 +1,12 @@
 package com.iou;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.iou.contract.IOUContract;
-import com.iou.flow.IOUFlow;
-import com.iou.state.IOUState;
-import net.corda.core.contracts.TransactionVerificationException;
-import net.corda.core.crypto.CryptoUtilities;
-import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutionException;
-
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertTrue;
+import static net.corda.node.utilities.DatabaseSupportKt.databaseTransaction;
+import static org.junit.Assert.*;
 
 public class IOUFlowTests {
     private MockNetwork net;
