@@ -72,7 +72,7 @@ public class IOUFlowTests {
 //    }
 
 //    @Test
-//    public void signedTransactionReturnedByTheFlowIsSignedByTheAcceptor() throws Exception {
+//    public void flowReturnsTransactionSignedByTheAcceptor() throws Exception {
 //        IOUState state = new IOUState(
 //                1,
 //                a.info.getLegalIdentity(),
