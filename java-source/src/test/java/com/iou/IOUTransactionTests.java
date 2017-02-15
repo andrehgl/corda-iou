@@ -1,8 +1,11 @@
 package com.iou;
 
+import com.iou.contract.IOUContract;
+import com.iou.state.IOUState;
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.Party;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static net.corda.testing.CoreTestUtils.*;
 
@@ -22,8 +25,6 @@ public class IOUTransactionTests {
 //        ledger(ledgerDSL -> {
 //            ledgerDSL.transaction(txDSL -> {
 //                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
-//                // Uncomment once you've added the Create command constraint.
-//                // txDSL.command(keys, IOUContract.Commands.Create::new);
 //                txDSL.failsWith("The IOU's value must be non-negative.");
 //                return null;
 //            });
@@ -37,8 +38,6 @@ public class IOUTransactionTests {
 //            ledgerDSL.transaction(txDSL -> {
 //                txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                // Uncomment once you've added the Create command constraint.
-//                // txDSL.command(keys, IOUContract.Commands.Create::new);
 //                txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
 //                return null;
 //            });
@@ -52,8 +51,6 @@ public class IOUTransactionTests {
 //            ledgerDSL.transaction(txDSL -> {
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                // Uncomment once you've added the Create command constraint.
-//                // txDSL.command(keys, IOUContract.Commands.Create::new);
 //                txDSL.failsWith("Only one output state should be created.");
 //                return null;
 //            });
@@ -69,7 +66,7 @@ public class IOUTransactionTests {
 //                txDSL.fails();
 //                txDSL.command(keys, IOUContract.Commands.Create::new);
 //                txDSL.verifies();
-//                return null;
+//                return   null;
 //            });
 //            return null;
 //        });
