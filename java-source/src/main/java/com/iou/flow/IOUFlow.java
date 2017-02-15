@@ -6,6 +6,8 @@ import net.corda.core.crypto.Party;
 import net.corda.core.flows.FlowLogic;
 import net.corda.core.transactions.SignedTransaction;
 
+import static kotlin.collections.CollectionsKt.single;
+
 public class IOUFlow {
     public static class Initiator extends FlowLogic<SignedTransaction> {
         private final IOUState iou;
