@@ -72,7 +72,7 @@ public class IOUPlugin extends CordaPluginRegistry {
         kryo.register(LedgerTransaction.class);
         kryo.register(AuthenticatedObject.class);
         // Uncomment once you've added the Create command constraint.
-        // kryo.register(IOUContract.Commands.Create.class);
+        // kryo.register(IOUContract.Create.class);
         kryo.register(Timestamp.class);
         kryo.register(TransactionType.General.class);
         return true;

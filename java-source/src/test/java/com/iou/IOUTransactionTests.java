@@ -64,7 +64,7 @@ public class IOUTransactionTests {
 //            ledgerDSL.transaction(txDSL -> {
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
 //                txDSL.fails();
-//                txDSL.command(keys, IOUContract.Commands.Create::new);
+//                txDSL.command(keys, IOUContract.Create::new);
 //                txDSL.verifies();
 //                return   null;
 //            });
@@ -79,7 +79,7 @@ public class IOUTransactionTests {
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
 //                CompositeKey[] keys = new CompositeKey[1];
 //                keys[0] = getMINI_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Commands.Create::new);
+//                txDSL.command(keys, IOUContract.Create::new);
 //                txDSL.failsWith("All of the participants must be signers.");
 //                return null;
 //            });
@@ -94,7 +94,7 @@ public class IOUTransactionTests {
 //                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
 //                CompositeKey[] keys = new CompositeKey[1];
 //                keys[0] = getMEGA_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Commands.Create::new);
+//                txDSL.command(keys, IOUContract.Create::new);
 //                txDSL.failsWith("All of the participants must be signers.");
 //                return null;
 //            });
