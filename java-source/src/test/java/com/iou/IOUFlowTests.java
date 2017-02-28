@@ -9,6 +9,7 @@ import net.corda.core.contracts.TransactionState;
 import net.corda.core.contracts.TransactionVerificationException;
 import net.corda.core.crypto.CryptoUtilities;
 import net.corda.core.transactions.SignedTransaction;
+import net.corda.core.utilities.TestConstants;
 import net.corda.testing.node.MockNetwork;
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +18,6 @@ import org.junit.Test;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static net.corda.node.utilities.DatabaseSupportKt.databaseTransaction;
 import static org.junit.Assert.*;
 
 public class IOUFlowTests {
@@ -28,10 +28,13 @@ public class IOUFlowTests {
     @Before
     public void setup() {
         net = new MockNetwork();
-        MockNetwork.BasketOfNodes nodes = net.createSomeNodes(2);
+        MockNetwork.BasketOfNodes nodes = net.createSomeNodes(
+                2,
+                MockNetwork.DefaultFactory.INSTANCE,
+                TestConstants.getDUMMY_NOTARY_KEY());
         a = nodes.getPartyNodes().get(0);
         b = nodes.getPartyNodes().get(1);
-        net.runNetwork();
+        net.runNetwork(-1);
     }
 
     @After
@@ -48,12 +51,12 @@ public class IOUFlowTests {
 //                new IOUContract());
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
+//        net.runNetwork(-1);
 //
 //        SignedTransaction signedTx = future.get();
 //        signedTx.verifySignatures(CryptoUtilities.getComposite(b.getServices().getLegalIdentityKey().getPublic()));
 //    }
-
+//
 //    @Test
 //    public void flowRejectsInvalidIOUStates() throws InterruptedException {
 //        IOUState state = new IOUState(
@@ -63,7 +66,7 @@ public class IOUFlowTests {
 //                new IOUContract());
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
+//        net.runNetwork(-1);
 //
 //        // The IOUContract specifies that an IOU's value cannot be negative.
 //        try {
@@ -73,7 +76,7 @@ public class IOUFlowTests {
 //            assertTrue(e.getCause() instanceof TransactionVerificationException.ContractRejection);
 //        }
 //    }
-
+//
 //    @Test
 //    public void flowReturnsTransactionSignedByTheAcceptor() throws Exception {
 //        IOUState state = new IOUState(
@@ -83,12 +86,12 @@ public class IOUFlowTests {
 //                new IOUContract());
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
+//        net.runNetwork(-1);
 //
 //        SignedTransaction signedTx = future.get();
 //        signedTx.verifySignatures(CryptoUtilities.getComposite(a.getServices().getLegalIdentityKey().getPublic()));
 //    }
-
+//
 //    @Test
 //    public void flowRecordsATransactionInBothPartiesVaults() throws Exception {
 //        IOUState state = new IOUState(
@@ -98,22 +101,18 @@ public class IOUFlowTests {
 //                new IOUContract());
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
+//        net.runNetwork(-1);
 //        SignedTransaction signedTx = future.get();
 //
-//        databaseTransaction(a.database, it -> {
-//            SignedTransaction recordedTx = a.storage.getValidatedTransactions().getTransaction(signedTx.getId());
-//            assertEquals(signedTx.getId(), recordedTx.getId());
-//            return null;
-//        });
+//        // Checks on A's vault.
+//        SignedTransaction recordedTxA = a.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//        assertEquals(signedTx.getId(), recordedTxA.getId());
 //
-//        databaseTransaction(b.database, it -> {
-//            SignedTransaction recordedTx = b.storage.getValidatedTransactions().getTransaction(signedTx.getId());
-//            assertEquals(signedTx.getId(), recordedTx.getId());
-//            return null;
-//        });
+//        // Checks on B's vault.
+//        SignedTransaction recordedTxB = b.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//        assertEquals(signedTx.getId(), recordedTxB.getId());
 //    }
-
+//
 //    @Test
 //    public void recordedTransactionHasNoInputsAndASingleOutputTheInputIOU() throws Exception {
 //        IOUState inputState = new IOUState(
@@ -123,33 +122,29 @@ public class IOUFlowTests {
 //                new IOUContract());
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(inputState, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
-//        net.runNetwork();
+//        net.runNetwork(-1);
 //        SignedTransaction signedTx = future.get();
 //
-//        databaseTransaction(a.database, it -> {
-//            SignedTransaction recordedTx = a.storage.getValidatedTransactions().getTransaction(signedTx.getId());
-//            List<TransactionState<ContractState>> txOutputs = recordedTx.getTx().getOutputs();
-//            assert(txOutputs.size() == 1);
+//        // Checks on A's vault.
+//        SignedTransaction recordedTxA = a.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//        List<TransactionState<ContractState>> txOutputsA = recordedTxA.getTx().getOutputs();
+//        assert (txOutputsA.size() == 1);
 //
-//            IOUState recordedState = (IOUState) txOutputs.get(0).getData();
-//            assertEquals(recordedState.getIOUValue(), inputState.getIOUValue());
-//            assertEquals(recordedState.getSender(), inputState.getSender());
-//            assertEquals(recordedState.getRecipient(), inputState.getRecipient());
-//            assertEquals(recordedState.getLinearId(), inputState.getLinearId());
-//            return null;
-//        });
+//        IOUState recordedStateA = (IOUState) txOutputsA.get(0).getData();
+//        assertEquals(recordedStateA.getIOUValue(), inputState.getIOUValue());
+//        assertEquals(recordedStateA.getSender(), inputState.getSender());
+//        assertEquals(recordedStateA.getRecipient(), inputState.getRecipient());
+//        assertEquals(recordedStateA.getLinearId(), inputState.getLinearId());
 //
-//        databaseTransaction(b.database, it -> {
-//            SignedTransaction recordedTx = b.storage.getValidatedTransactions().getTransaction(signedTx.getId());
-//            List<TransactionState<ContractState>> txOutputs = recordedTx.getTx().getOutputs();
-//            assert(txOutputs.size() == 1);
+//        // Checks on B's vault.
+//        SignedTransaction recordedTxB = b.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//        List<TransactionState<ContractState>> txOutputsB = recordedTxB.getTx().getOutputs();
+//        assert (txOutputsB.size() == 1);
 //
-//            IOUState recordedState = (IOUState) txOutputs.get(0).getData();
-//            assertEquals(recordedState.getIOUValue(), inputState.getIOUValue());
-//            assertEquals(recordedState.getSender(), inputState.getSender());
-//            assertEquals(recordedState.getRecipient(), inputState.getRecipient());
-//            assertEquals(recordedState.getLinearId(), inputState.getLinearId());
-//            return null;
-//        });
+//        IOUState recordedStateB = (IOUState) txOutputsB.get(0).getData();
+//        assertEquals(recordedStateB.getIOUValue(), inputState.getIOUValue());
+//        assertEquals(recordedStateB.getSender(), inputState.getSender());
+//        assertEquals(recordedStateB.getRecipient(), inputState.getRecipient());
+//        assertEquals(recordedStateB.getLinearId(), inputState.getLinearId());
 //    }
 }
