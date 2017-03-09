@@ -1,101 +1,73 @@
 package com.iou;
 
+import com.google.common.collect.ImmutableSet;
+import com.iou.contract.IOUContract;
+import com.iou.state.IOUState;
+import net.corda.core.contracts.LinearState;
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.Party;
-import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static net.corda.testing.CoreTestUtils.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class IOUStateTests {
     static private final Party miniCorp = getMINI_CORP();
     static private final Party megaCorp = getMEGA_CORP();
-    static private final CompositeKey[] keys = new CompositeKey[2];
-
-    @BeforeClass
-    public static void setUpClass() {
-        keys[0] = getMEGA_CORP_PUBKEY();
-        keys[1] = getMINI_CORP_PUBKEY();
-    }
+    static private final CompositeKey miniCorpKey = getMINI_CORP_PUBKEY();
+    static private final CompositeKey megaCorpKey = getMEGA_CORP_PUBKEY();
 
 //    @Test
-//    public void cannotCreateNegativeValueIOUs() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("The IOU's value must be non-negative.");
-//                return null;
-//            });
-//            return null;
-//        });
+//    public void hasIOUValueFieldOfCorrectType() throws NoSuchFieldException {
+//        // Does the iouValue field exist?
+//        IOUState.class.getDeclaredField("iouValue");
+//        // Is the iouValue field of the correct type?
+//        assertEquals(IOUState.class.getDeclaredField("iouValue").getType(), Integer.class);
 //    }
 
 //    @Test
-//    public void transactionMustHaveNoInputs() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
-//                return null;
-//            });
-//            return null;
-//        });
+//    public void hasSenderFieldOfCorrectType() throws NoSuchFieldException {
+//        // Does the sender field exist?
+//        IOUState.class.getDeclaredField("sender");
+//        // Is the sender field of the correct type?
+//        assertEquals(IOUState.class.getDeclaredField("sender").getType(), Party.class);
 //    }
 
 //    @Test
-//    public void transactionMustHaveOneOutput() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("Only one output state should be created.");
-//                return null;
-//            });
-//            return null;
-//        });
+//    public void hasRecipientFieldOfCorrectType() throws NoSuchFieldException {
+//        // Does the recipient field exist?
+//        IOUState.class.getDeclaredField("recipient");
+//        // Is the recipient field of the correct type?
+//        assertEquals(IOUState.class.getDeclaredField("recipient").getType(), Party.class);
 //    }
 
 //    @Test
-//    public void transactionMustIncludeCreateCommand() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.fails();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.verifies();
-//                return   null;
-//            });
-//            return null;
-//        });
+//    public void senderIsParticipant() {
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        assertNotEquals(iouState.getParticipants().indexOf(miniCorpKey), -1);
 //    }
 
 //    @Test
-//    public void senderMustSignTransaction() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                CompositeKey[] keys = new CompositeKey[1];
-//                keys[0] = getMINI_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.failsWith("All of the participants must be signers.");
-//                return null;
-//            });
-//            return null;
-//        });
+//    public void recipientIsParticipant() {
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        assertNotEquals(iouState.getParticipants().indexOf(megaCorpKey), -1);
 //    }
 
 //    @Test
-//    public void recipientMustSignTransaction() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                CompositeKey[] keys = new CompositeKey[1];
-//                keys[0] = getMEGA_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.failsWith("All of the participants must be signers.");
-//                return null;
-//            });
-//            return null;
-//        });
+//    public void isLinearState() {
+//        assert(LinearState.class.isAssignableFrom(IOUState.class));
+//    }
+
+//    @Test
+//    public void isRelevantToSender() {
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        assert(iouState.isRelevant(ImmutableSet.of(miniCorpKey.getSingleKey())));
+//    }
+
+//    @Test
+//    public void isRelevantToRecipient() {
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        assert(iouState.isRelevant(ImmutableSet.of(megaCorpKey.getSingleKey())));
 //    }
 }
