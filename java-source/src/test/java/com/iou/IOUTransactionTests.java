@@ -16,89 +16,78 @@ public class IOUTransactionTests {
 
     @BeforeClass
     public static void setUpClass() {
-        keys[0] = getMEGA_CORP_PUBKEY();
-        keys[1] = getMINI_CORP_PUBKEY();
+        keys[0] = getMINI_CORP_PUBKEY();
+        keys[1] = getMEGA_CORP_PUBKEY();
     }
 
-//    @Test
-//    public void cannotCreateNegativeValueIOUs() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("The IOU's value must be non-negative.");
-//                return null;
-//            });
-//            return null;
-//        });
-//    }
+    @Test
+    public void cannotCreateNegativeValueIOUs() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.command(keys, IOUContract.Create::new);
+                txDSL.failsWith("The IOU's value must be non-negative.");
+                return null;
+            });
+            return null;
+        });
+    }
 
-//    @Test
-//    public void transactionMustHaveNoInputs() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
-//                return null;
-//            });
-//            return null;
-//        });
-//    }
+    @Test
+    public void createTransactionMustHaveNoInputs() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.input(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.command(keys, IOUContract.Create::new);
+                txDSL.failsWith("No inputs should be consumed when issuing an IOU.");
+                return null;
+            });
+            return null;
+        });
+    }
 
-//    @Test
-//    public void transactionMustHaveOneOutput() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.failsWith("Only one output state should be created.");
-//                return null;
-//            });
-//            return null;
-//        });
-//    }
+    @Test
+    public void createTransactionMustHaveOneOutput() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                txDSL.command(keys, IOUContract.Create::new);
+                txDSL.failsWith("Only one output state should be created.");
+                return null;
+            });
+            return null;
+        });
+    }
 
-//    @Test
-//    public void transactionMustIncludeCreateCommand() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                txDSL.fails();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.verifies();
-//                return   null;
-//            });
-//            return null;
-//        });
-//    }
+    @Test
+    public void senderMustSignCreateTransaction() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                CompositeKey[] keys = new CompositeKey[1];
+                keys[0] = getMEGA_CORP_PUBKEY();
+                txDSL.command(keys, IOUContract.Create::new);
+                txDSL.failsWith("All of the participants must be signers.");
+                return null;
+            });
+            return null;
+        });
+    }
 
-//    @Test
-//    public void senderMustSignTransaction() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                CompositeKey[] keys = new CompositeKey[1];
-//                keys[0] = getMINI_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.failsWith("All of the participants must be signers.");
-//                return null;
-//            });
-//            return null;
-//        });
-//    }
-
-//    @Test
-//    public void recipientMustSignTransaction() {
-//        ledger(ledgerDSL -> {
-//            ledgerDSL.transaction(txDSL -> {
-//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
-//                CompositeKey[] keys = new CompositeKey[1];
-//                keys[0] = getMEGA_CORP_PUBKEY();
-//                txDSL.command(keys, IOUContract.Create::new);
-//                txDSL.failsWith("All of the participants must be signers.");
-//                return null;
-//            });
-//            return null;
-//        });
-//    }
+    @Test
+    public void recipientMustSignCreateTransaction() {
+        ledger(ledgerDSL -> {
+            ledgerDSL.transaction(txDSL -> {
+                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+                CompositeKey[] keys = new CompositeKey[1];
+                keys[0] = getMINI_CORP_PUBKEY();
+                txDSL.command(keys, IOUContract.Create::new);
+                txDSL.failsWith("All of the participants must be signers.");
+                return null;
+            });
+            return null;
+        });
+    }
 }
