@@ -74,7 +74,6 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 a.info.getLegalIdentity(),
                 new IOUContract());
-
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);
