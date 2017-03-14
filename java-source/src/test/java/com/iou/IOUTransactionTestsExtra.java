@@ -28,6 +28,31 @@ public class IOUTransactionTestsExtra {
     }
 
 //    @Test
+//    public void mustIncludeCommand() {
+//        ledger(ledgerDSL -> {
+//            ledgerDSL.transaction(txDSL -> {
+//                txDSL.output(new IOUState(1, miniCorp, megaCorp, new IOUContract()));
+//                txDSL.fails();
+//                return null;
+//            });
+//            return null;
+//        });
+//    }
+
+//    @Test
+//    public void cannotCreateNegativeValueIOUs() {
+//        ledger(ledgerDSL -> {
+//            ledgerDSL.transaction(txDSL -> {
+//                txDSL.output(new IOUState(-1, miniCorp, megaCorp, new IOUContract()));
+//                txDSL.command(keys, IOUContract.Create::new);
+//                txDSL.failsWith("The IOU's value must be non-negative.");
+//                return null;
+//            });
+//            return null;
+//        });
+//    }
+
+//    @Test
 //    public void transferTransactionMustHaveOneInput() {
 //        ledger(ledgerDSL -> {
 //            ledgerDSL.transaction(txDSL -> {
