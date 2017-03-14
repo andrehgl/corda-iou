@@ -68,11 +68,11 @@ public class IOUFlowTests {
 
     @Test
     public void flowRejectsInvalidIOUStates() throws Exception {
-        // The IOUContract specifies that an IOU's sender and recipient cannot be the same.
+        // The IOUContract specifies that an IOU cannot have a negative value.
         IOUState state = new IOUState(
                 -1,
                 a.info.getLegalIdentity(),
-                a.info.getLegalIdentity(),
+                b.info.getLegalIdentity(),
                 new IOUContract());
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
