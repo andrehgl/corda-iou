@@ -28,6 +28,7 @@ public class IOUFlowTests {
     private MockNetwork net;
     private MockNode a;
     private MockNode b;
+    private MockNode notary;
 
     @Before
     public void setup() {
@@ -38,6 +39,7 @@ public class IOUFlowTests {
                 TestConstants.getDUMMY_NOTARY_KEY());
         a = nodes.getPartyNodes().get(0);
         b = nodes.getPartyNodes().get(1);
+        notary = nodes.getNotaryNode();
         net.runNetwork(-1);
     }
 
@@ -61,7 +63,7 @@ public class IOUFlowTests {
         net.runNetwork(-1);
 
         SignedTransaction signedTx = future.get();
-        signedTx.verifySignatures(b.info.getLegalIdentity().getOwningKey());
+        signedTx.verifySignatures(b.info.getLegalIdentity().getOwningKey(), notary.info.getLegalIdentity().getOwningKey());
     }
 
     @Test
@@ -92,7 +94,7 @@ public class IOUFlowTests {
         net.runNetwork(-1);
 
         SignedTransaction signedTx = future.get();
-        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey());
+        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), notary.info.getLegalIdentity().getOwningKey());
     }
 
     @Test
