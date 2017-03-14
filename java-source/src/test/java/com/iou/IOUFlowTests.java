@@ -8,8 +8,8 @@ import com.iou.state.IOUState;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.TransactionState;
 import net.corda.core.contracts.TransactionVerificationException;
+import net.corda.core.crypto.Party;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.utilities.TestConstants;
 import net.corda.testing.node.MockNetwork;
 import net.corda.testing.node.MockNetwork.MockNode;
 import org.junit.After;
@@ -20,6 +20,8 @@ import org.junit.rules.ExpectedException;
 
 import java.util.List;
 
+import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY;
+import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY_KEY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +30,6 @@ public class IOUFlowTests {
     private MockNetwork net;
     private MockNode a;
     private MockNode b;
-    private MockNode notary;
 
     @Before
     public void setup() {
@@ -36,10 +37,9 @@ public class IOUFlowTests {
         MockNetwork.BasketOfNodes nodes = net.createSomeNodes(
                 2,
                 MockNetwork.DefaultFactory.INSTANCE,
-                TestConstants.getDUMMY_NOTARY_KEY());
+                getDUMMY_NOTARY_KEY());
         a = nodes.getPartyNodes().get(0);
         b = nodes.getPartyNodes().get(1);
-        notary = nodes.getNotaryNode();
         net.runNetwork(-1);
     }
 
@@ -58,12 +58,13 @@ public class IOUFlowTests {
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
                 new IOUContract());
+        Party notary2 = a.getServices().getNetworkMapCache().getNotaryNodes().get(0).getNotaryIdentity();
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);
 
         SignedTransaction signedTx = future.get();
-        signedTx.verifySignatures(b.info.getLegalIdentity().getOwningKey(), notary.info.getLegalIdentity().getOwningKey());
+        signedTx.verifySignatures(b.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
     }
 
     @Test
@@ -94,7 +95,7 @@ public class IOUFlowTests {
         net.runNetwork(-1);
 
         SignedTransaction signedTx = future.get();
-        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), notary.info.getLegalIdentity().getOwningKey());
+        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
     }
 
     @Test
