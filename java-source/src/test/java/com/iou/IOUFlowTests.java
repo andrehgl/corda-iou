@@ -8,6 +8,7 @@ import com.iou.state.IOUState;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.TransactionState;
 import net.corda.core.contracts.TransactionVerificationException;
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.testing.node.MockNetwork;
@@ -57,7 +58,8 @@ public class IOUFlowTests {
                 1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
         Party notary2 = a.getServices().getNetworkMapCache().getNotaryNodes().get(0).getNotaryIdentity();
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
@@ -74,7 +76,8 @@ public class IOUFlowTests {
                 -1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);
@@ -89,7 +92,8 @@ public class IOUFlowTests {
                 1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);
@@ -104,7 +108,8 @@ public class IOUFlowTests {
                 1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
         IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);
@@ -122,7 +127,8 @@ public class IOUFlowTests {
                 1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
         IOUFlow.Initiator flow = new IOUFlow.Initiator(inputState, b.info.getLegalIdentity());
         ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
         net.runNetwork(-1);

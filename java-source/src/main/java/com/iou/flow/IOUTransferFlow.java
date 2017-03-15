@@ -49,7 +49,8 @@ public class IOUTransferFlow {
                     inputStateData.getIOUValue(),
                     sender,
                     newRecipient,
-                    new IOUContract()
+                    new IOUContract(),
+                    inputStateData.getLinearId()
             );
 
             // Stage x - Creating the transfer command.

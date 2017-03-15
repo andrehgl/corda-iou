@@ -70,9 +70,7 @@ public class IOUTransferSubflow {
 
             // Stage 4 - Verifying the transaction
             try {
-                partSignedTx.toLedgerTransaction(getServiceHub()).verify();
-            } catch (SignatureException ex) {
-                throw new RuntimeException("Signatures are invalid or unrecognized.", ex);
+                partSignedTx.getTx().toLedgerTransaction(getServiceHub()).verify();
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException("Required attachment was not found in storage.", ex);
             } catch (TransactionResolutionException ex) {

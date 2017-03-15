@@ -1,5 +1,6 @@
 package com.iou;
 
+import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.iou.contract.IOUContract;
@@ -7,6 +8,7 @@ import com.iou.flow.IOUTransferFlow;
 import com.iou.state.IOUState;
 import net.corda.core.contracts.*;
 import net.corda.core.crypto.CompositeKey;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.testing.node.MockNetwork;
@@ -23,6 +25,7 @@ import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY;
 import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY_KEY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static net.corda.node.utilities.DatabaseSupportKt.databaseTransaction;
 
 public class IOUTransferFlowTests {
@@ -57,7 +60,8 @@ public class IOUTransferFlowTests {
                 1,
                 a.info.getLegalIdentity(),
                 b.info.getLegalIdentity(),
-                new IOUContract());
+                new IOUContract(),
+                new UniqueIdentifier());
 
         return insertIOUCreationTransaction(state);
     }
@@ -66,7 +70,7 @@ public class IOUTransferFlowTests {
         final List<CompositeKey> keysAB = ImmutableList.of(
                 a.info.getLegalIdentity().getOwningKey(),
                 b.info.getLegalIdentity().getOwningKey());
-        final Command txCommand = new Command(new IOUContract.Transfer(), keysAB);
+        final Command txCommand = new Command(new IOUContract.Create(), keysAB);
 
         final TransactionBuilder tb =  new TransactionType.General
                 .Builder(getDUMMY_NOTARY())
@@ -78,27 +82,23 @@ public class IOUTransferFlowTests {
                 .signWith(getDUMMY_NOTARY_KEY())
                 .toSignedTransaction(true);
 
-        // TODO: Problem with resolving transactions - works fine if we insert for c.
         for (MockNode node : ImmutableList.of(a, b)) {
-            databaseTransaction(node.database, it -> {
-                node.getServices().recordTransactions(ImmutableList.of(tx));
-                return null;
-            });
+            node.getServices().recordTransactions(ImmutableList.of(tx));
         }
 
         return new StateRef(tx.getId(), 0);
     }
 
-    @Test
-    public void flowReturnsTransactionSignedByTheInitiator() throws Exception {
-        final StateRef stateRef = insertStandardIOUCreationTransaction();
-        IOUTransferFlow.Initiator flow = new IOUTransferFlow.Initiator(stateRef, c.info.getLegalIdentity());
-        ListenableFuture<SignedTransaction> future = b.getServices().startFlow(flow).getResultFuture();
-        net.runNetwork(-1);
-
-        SignedTransaction signedTx = future.get();
-        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), c.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
-    }
+//    @Test
+//    public void flowReturnsTransactionSignedByTheInitiator() throws Exception {
+//        final StateRef stateRef = insertStandardIOUCreationTransaction();
+//        IOUTransferFlow.Initiator flow = new IOUTransferFlow.Initiator(stateRef, c.info.getLegalIdentity());
+//        ListenableFuture<SignedTransaction> future = b.getServices().startFlow(flow).getResultFuture();
+//        net.runNetwork(-1);
+//
+//        SignedTransaction signedTx = future.get();
+//        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), c.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
+//    }
 
 //    @Test
 //    public void onlyCurrentIOURecipientCanInitiateFlow() throws Exception {
@@ -109,14 +109,15 @@ public class IOUTransferFlowTests {
 //        exception.expectCause(instanceOf(IllegalArgumentException.class));
 //        future.get();
 //    }
-//
+
 //    @Test
 //    public void flowRejectsInvalidIOUStates() throws Exception {
 //        IOUState state = new IOUState(
 //                -1,
 //                a.info.getLegalIdentity(),
 //                b.info.getLegalIdentity(),
-//                new IOUContract());
+//                new IOUContract(),
+//                new UniqueIdentifier());
 //        final StateRef stateRef = insertIOUCreationTransaction(state);
 //        IOUTransferFlow.Initiator flow = new IOUTransferFlow.Initiator(stateRef, c.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = b.getServices().startFlow(flow).getResultFuture();
@@ -125,7 +126,7 @@ public class IOUTransferFlowTests {
 //        exception.expectCause(instanceOf(TransactionVerificationException.class));
 //        future.get();
 //    }
-//
+
 //    @Test
 //    public void flowReturnsTransactionSignedByTheOldRecipient() throws Exception {
 //        final StateRef stateRef = insertStandardIOUCreationTransaction();
@@ -136,7 +137,7 @@ public class IOUTransferFlowTests {
 //        SignedTransaction signedTx = future.get();
 //        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), c.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
 //    }
-//
+
 //    @Test
 //    public void flowReturnsTransactionSignedByTheNewRecipient() throws Exception {
 //        final StateRef stateRef = insertStandardIOUCreationTransaction();
@@ -147,7 +148,7 @@ public class IOUTransferFlowTests {
 //        SignedTransaction signedTx = future.get();
 //        signedTx.verifySignatures(a.info.getLegalIdentity().getOwningKey(), b.info.getLegalIdentity().getOwningKey(), getDUMMY_NOTARY().getOwningKey());
 //    }
-//
+
 //    @Test
 //    public void flowRecordsATransactionInAllPartiesVaults() throws Exception {
 //        final StateRef stateRef = insertStandardIOUCreationTransaction();
@@ -164,28 +165,35 @@ public class IOUTransferFlowTests {
 
 //    @Test
 //    public void recordedTransactionHasNoInputsAndASingleOutputTheInputIOU() throws Exception {
-//        IOUState inputState = new IOUState(
+//        final IOUState inputState = new IOUState(
 //                1,
 //                a.info.getLegalIdentity(),
 //                b.info.getLegalIdentity(),
-//                new IOUContract());
+//                new IOUContract(),
+//                new UniqueIdentifier());
 //        final StateRef stateRef = insertIOUCreationTransaction(inputState);
 //        IOUTransferFlow.Initiator flow = new IOUTransferFlow.Initiator(stateRef, c.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = b.getServices().startFlow(flow).getResultFuture();
 //        net.runNetwork(-1);
 //        SignedTransaction signedTx = future.get();
 //
-//        // TODO: Change these requirements to match transfer restrictions
 //        for (MockNode node : ImmutableList.of(a, b, c)) {
-//            SignedTransaction recordedTx = node.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//            final SignedTransaction recordedTx = node.storage.getValidatedTransactions().getTransaction(signedTx.getId());
+//
+//            // Test on the number of inputs.
+//            final List<StateRef> txInputs = recordedTx.getTx().getInputs();
+//            assert(txInputs.size() == 1);
+//
+//            // Test on the number of outputs.
 //            List<TransactionState<ContractState>> txOutputs = recordedTx.getTx().getOutputs();
 //            assert(txOutputs.size() == 1);
 //
-//            IOUState recordedState = (IOUState) txOutputs.get(0).getData();
-//            assertEquals(recordedState.getIOUValue(), inputState.getIOUValue());
-//            assertEquals(recordedState.getSender(), inputState.getSender());
-//            assertEquals(recordedState.getRecipient(), inputState.getRecipient());
-//            assertEquals(recordedState.getLinearId(), inputState.getLinearId());
+//            // Tests on the output's attributes.
+//            IOUState outputState = (IOUState) txOutputs.get(0).getData();
+//            assertEquals(inputState.getIOUValue(), outputState.getIOUValue());
+//            assertEquals(inputState.getSender(), outputState.getSender());
+//            assertEquals(inputState.getLinearId(), outputState.getLinearId());
+//            assertNotEquals(inputState.getRecipient(), outputState.getRecipient());
 //        }
 //    }
 }
