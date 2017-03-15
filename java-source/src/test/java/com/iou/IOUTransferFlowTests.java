@@ -1,6 +1,5 @@
 package com.iou;
 
-import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.iou.contract.IOUContract;
@@ -8,7 +7,6 @@ import com.iou.flow.IOUTransferFlow;
 import com.iou.state.IOUState;
 import net.corda.core.contracts.*;
 import net.corda.core.crypto.CompositeKey;
-import net.corda.core.crypto.SecureHash;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.testing.node.MockNetwork;
@@ -26,7 +24,6 @@ import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY_KEY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static net.corda.node.utilities.DatabaseSupportKt.databaseTransaction;
 
 public class IOUTransferFlowTests {
     private MockNetwork net;
