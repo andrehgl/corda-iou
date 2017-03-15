@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.iou.contract.IOUContract;
 import com.iou.state.IOUState;
 import net.corda.core.contracts.LinearState;
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.CompositeKey;
 import net.corda.core.crypto.Party;
 import org.junit.Test;
@@ -44,13 +45,13 @@ public class IOUStateTests {
 
 //    @Test
 //    public void senderIsParticipant() {
-//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract(), new UniqueIdentifier());
 //        assertNotEquals(iouState.getParticipants().indexOf(miniCorpKey), -1);
 //    }
 
 //    @Test
 //    public void recipientIsParticipant() {
-//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract(), new UniqueIdentifier());
 //        assertNotEquals(iouState.getParticipants().indexOf(megaCorpKey), -1);
 //    }
 
@@ -61,13 +62,13 @@ public class IOUStateTests {
 
 //    @Test
 //    public void isRelevantToSender() {
-//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract(), new UniqueIdentifier());
 //        assert(iouState.isRelevant(ImmutableSet.of(miniCorpKey.getSingleKey())));
 //    }
 
 //    @Test
 //    public void isRelevantToRecipient() {
-//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract());
+//        IOUState iouState = new IOUState(1, miniCorp, megaCorp, new IOUContract(), new UniqueIdentifier());
 //        assert(iouState.isRelevant(ImmutableSet.of(megaCorpKey.getSingleKey())));
 //    }
 }
