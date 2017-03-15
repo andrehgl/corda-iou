@@ -23,6 +23,7 @@ import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY;
 import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY_KEY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static net.corda.node.utilities.DatabaseSupportKt.databaseTransaction;
 
 public class IOUTransferFlowTests {
     private MockNetwork net;
@@ -79,7 +80,10 @@ public class IOUTransferFlowTests {
 
         // TODO: Problem with resolving transactions - works fine if we insert for c.
         for (MockNode node : ImmutableList.of(a, b)) {
-            node.getServices().recordTransactions(ImmutableList.of(tx));
+            databaseTransaction(node.database, it -> {
+                node.getServices().recordTransactions(ImmutableList.of(tx));
+                return null;
+            });
         }
 
         return new StateRef(tx.getId(), 0);
