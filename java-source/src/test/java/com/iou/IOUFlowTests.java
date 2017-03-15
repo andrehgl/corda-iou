@@ -60,7 +60,6 @@ public class IOUFlowTests {
 //                b.info.getLegalIdentity(),
 //                new IOUContract(),
 //                new UniqueIdentifier());
-//        Party notary2 = a.getServices().getNetworkMapCache().getNotaryNodes().get(0).getNotaryIdentity();
 //        IOUFlow.Initiator flow = new IOUFlow.Initiator(state, b.info.getLegalIdentity());
 //        ListenableFuture<SignedTransaction> future = a.getServices().startFlow(flow).getResultFuture();
 //        net.runNetwork(-1);
