@@ -34,16 +34,16 @@ public class IOUTransferFlow {
 
         @Suspendable
         public SignedTransaction call() throws FlowException {
-            // Stage x - Retrieving the existing IOU from the vault.
+            // Stage 1 - Retrieving the existing IOU from the vault.
             final TransactionState inputState = getServiceHub().getVaultService().statesForRefs(ImmutableList.of(stateRef)).get(stateRef);
             final IOUState inputStateData = (IOUState) inputState.getData();
 
-            // Stage x - This flow-logic can only be initiated by the current recipient.
+            // Stage 2 - This flow-logic can only be initiated by the current recipient.
             if (!getServiceHub().getMyInfo().getLegalIdentity().getName().equals(inputStateData.getRecipient().getName())) {
                 throw new IllegalArgumentException("IOU transfer can only be initiated by the IOU's current recipient");
             }
 
-            // Stage x - Creating the output state.
+            // Stage 3 - Creating the output state.
             final Party sender = inputStateData.getSender();
             final IOUState outputState = new IOUState(
                     inputStateData.getIOUValue(),
@@ -53,17 +53,17 @@ public class IOUTransferFlow {
                     inputStateData.getLinearId()
             );
 
-            // Stage x - Creating the transfer command.
+            // Stage 4 - Creating the transfer command.
             final List<CompositeKey> participants = inputState.getData().getParticipants();
             participants.add(newRecipient.getOwningKey());
             final Command txCommand = new Command(new IOUContract.Transfer(), participants);
 
-            // Stage x - Generating an unsigned transaction.
+            // Stage 5 - Generating an unsigned transaction.
             final Party notary = single(getServiceHub().getNetworkMapCache().getNotaryNodes()).getNotaryIdentity();
             final StateAndRef inputStateAndRef = new StateAndRef(inputState, stateRef);
             final TransactionBuilder unsignedTx = new TransactionType.General.Builder(notary).withItems(inputStateAndRef, outputState, txCommand);
 
-            // Stage x - Verifying the transaction.
+            // Stage 6 - Verifying the transaction.
             try {
                 unsignedTx.toWireTransaction().toLedgerTransaction(getServiceHub()).verify();
             } catch (FileNotFoundException ex) {
@@ -72,16 +72,16 @@ public class IOUTransferFlow {
                 throw new RuntimeException("An input points to a transaction not found in storage.", ex);
             }
 
-            // Stage x - Signing the transaction.
+            // Stage 7 - Signing the transaction.
             final KeyPair keyPair = getServiceHub().getLegalIdentityKey();
             final SignedTransaction partSignedTx = unsignedTx.signWith(keyPair).toSignedTransaction(false);
 
-            // Stage x - Collecting the counterparty signatures.
+            // Stage 8 - Collecting the counterparty signatures.
             final DigitalSignature.WithKey extraSig1 = subFlow(new IOUTransferSubflow.Initiator(partSignedTx, sender));
             final DigitalSignature.WithKey extraSig2 = subFlow(new IOUTransferSubflow.Initiator(partSignedTx, newRecipient));
             final SignedTransaction fullySignedTx = partSignedTx.plus(extraSig2).plus(extraSig1);
 
-            // Stage x - Calling FinalityFlow.
+            // Stage 9 - Calling FinalityFlow.
             final Set<Party> parties = ImmutableSet.of(sender, inputStateData.getRecipient(), newRecipient);
             subFlow(new FinalityFlow(fullySignedTx, parties));
 
