@@ -1,6 +1,7 @@
 package com.iou.service;
 
 import com.iou.flow.IOUFlow;
+import com.iou.flow.IOUTransferSubflow;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -19,6 +20,10 @@ public class IOUService {
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IOUFlow.Initiator.class),
                 IOUFlow.Acceptor::new
+        );
+        services.registerFlowInitiator(
+                JvmClassMappingKt.getKotlinClass(IOUTransferSubflow.Initiator.class),
+                IOUTransferSubflow.Acceptor::new
         );
     }
 }
