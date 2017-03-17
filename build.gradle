@@ -1,6 +1,7 @@
 buildscript {
     ext.corda_version = '0.8.2'
     ext.corda_gradle_plugins_version = '0.8'
+    ext.kotlin_version = '1.0.6'
     ext.quasar_version = '0.7.6'
 
     repositories {
@@ -10,6 +11,7 @@ buildscript {
     }
 
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "net.corda.plugins:publish-utils:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
         classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"

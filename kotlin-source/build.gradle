@@ -37,8 +37,8 @@ dependencies {
     compile "net.corda:core:$corda_version"
     compile "net.corda:finance:$corda_version"
     compile "net.corda:node:$corda_version"
-    compile "net.corda:corda:$corda_version"
     compile "net.corda:test-utils:$corda_version"
+    runtime "net.corda:corda:$corda_version"
 
     // GraphStream: For visualisation (required by ExampleClientRPC app)
     compile "org.graphstream:gs-core:1.3"
@@ -127,7 +127,7 @@ task generateFlowDiagram(type: JavaExec) {
     main = "net.sourceforge.plantuml.Run"
     args = [
             "-tsvg",
-            "-output", "../java-source/build/doc",
+            "-output", "../kotlin-source/build/doc",
             "-exclude", "inc_*",
             "../doc/*.plantuml"
     ]
@@ -135,6 +135,6 @@ task generateFlowDiagram(type: JavaExec) {
 
 task runExampleClientRPC(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = 'com.example.client.ExampleClientRPC'
+    main = 'com.example.client.ExampleClientRPCKt'
     args 'localhost:10004'
 }
