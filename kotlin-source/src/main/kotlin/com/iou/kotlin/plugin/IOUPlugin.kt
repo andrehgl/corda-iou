@@ -4,12 +4,11 @@ import com.esotericsoftware.kryo.Kryo
 import com.iou.kotlin.api.IOUApi
 import com.iou.kotlin.contract.IOUContract
 import com.iou.kotlin.flow.IOUFlow
+import com.iou.kotlin.flow.IOUSettleFlow
+import com.iou.kotlin.flow.SelfIssueCashFlow
 import com.iou.kotlin.service.IOUService
 import com.iou.kotlin.state.IOUState
-import net.corda.core.contracts.AuthenticatedObject
-import net.corda.core.contracts.Timestamp
-import net.corda.core.contracts.TransactionType
-import net.corda.core.contracts.TransactionVerificationException
+import net.corda.core.contracts.*
 import net.corda.core.crypto.Party
 import net.corda.core.node.CordaPluginRegistry
 import net.corda.core.transactions.LedgerTransaction
@@ -35,7 +34,9 @@ class IOUPlugin : CordaPluginRegistry() {
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
     override val requiredFlows = mapOf(
-            IOUFlow.Initiator::class.java.name to setOf(IOUState::class.java.name, Party::class.java.name))
+            IOUFlow.Initiator::class.java.name to setOf(IOUState::class.java.name, Party::class.java.name),
+            SelfIssueCashFlow::class.java.name to setOf(Int::class.java.name),
+            IOUSettleFlow::class.java.name to setOf(UniqueIdentifier::class.java.name, Int::class.java.name))
 
     /**
      * A list of long lived services to be hosted within the node. Typically you would use these to register flow
@@ -55,6 +56,9 @@ class IOUPlugin : CordaPluginRegistry() {
     override fun registerRPCKryoTypes(kryo: Kryo): Boolean {
         kryo.register(IOUState::class.java)
         kryo.register(IOUContract::class.java)
+        kryo.register(IOUContract.Commands.Create::class.java)
+        kryo.register(IOUContract.Commands.Transfer::class.java)
+        kryo.register(IOUContract.Commands.Settle::class.java)
         kryo.register(TransactionVerificationException.ContractRejection::class.java)
         kryo.register(LedgerTransaction::class.java)
         kryo.register(AuthenticatedObject::class.java)
