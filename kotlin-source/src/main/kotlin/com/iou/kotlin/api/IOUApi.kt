@@ -7,6 +7,7 @@ import com.iou.kotlin.flow.SelfIssueCashFlow
 import com.iou.kotlin.state.IOUState
 import net.corda.contracts.asset.Cash
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.crypto.Party
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.startFlow
 import java.util.concurrent.ExecutionException
@@ -23,6 +24,7 @@ class IOUApi(private val services: CordaRPCOps) {
     @GET
     @Path("ious")
     @Produces(MediaType.APPLICATION_JSON)
+    // Filter by state type: IOU.
     fun getIOUs() = services.vaultAndUpdates().first.filter { it.state.data is IOUState }
 
     /**
@@ -31,6 +33,7 @@ class IOUApi(private val services: CordaRPCOps) {
     @GET
     @Path("cash")
     @Produces(MediaType.APPLICATION_JSON)
+    // Filter by state type: Cash.
     fun getCash() = services.vaultAndUpdates().first.filter { it.state.data is Cash.State }
 
     /**
@@ -42,17 +45,20 @@ class IOUApi(private val services: CordaRPCOps) {
             @QueryParam(value = "value") iouValue: Int,
             @QueryParam(value = "party") partyName: String): Response {
 
-        val thisParty = services.nodeIdentity().legalIdentity
-        val otherParty = services.partyFromName(partyName)!!
+        // My identity
+        val thisParty: Party = services.nodeIdentity().legalIdentity
+        val otherParty: Party = services.partyFromName(partyName)!!
 
+        // Create an IOU state object.
         val state = IOUState(iouValue, thisParty, otherParty, IOUContract())
 
-        // The line below blocks and waits for the flow to return.
+        // Start the flow and wait for the future to resolve.
         val result = services
                 .startFlowDynamic(IOUFlow.Initiator::class.java, state, otherParty)
                 .returnValue
                 .get()
 
+        // Return the response via the web API.
         return Response
                 .status(Response.Status.CREATED)
                 .entity("Transaction id ${result.id} committed to ledger.").build()
