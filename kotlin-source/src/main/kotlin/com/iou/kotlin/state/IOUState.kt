@@ -21,8 +21,10 @@ data class IOUState(val iouValue: Int,
                     override val contract: IOUContract,
                     override val linearId: UniqueIdentifier = UniqueIdentifier(),
                     val paid: Int? = 0) : LinearState {
+
     override val participants: List<CompositeKey>
         get() = listOf(sender, recipient).map { it.owningKey }
+
     /**
      * This returns true if the state should be tracked by the vault of a particular node. In this case the logic is
      * simple; track this state if we are one of the involved parties.
@@ -30,7 +32,8 @@ data class IOUState(val iouValue: Int,
     override fun isRelevant(ourKeys: Set<PublicKey>): Boolean {
         return ourKeys.intersect(participants.flatMap {it.keys}).isNotEmpty()
     }
+
     fun pay(amount: Int) = copy(paid = amount)
-    val withoutPaidAmount: IOUState
-        get() = copy(paid = null)
+
+    fun withoutPaidAmount(): IOUState = copy(paid = null)
 }

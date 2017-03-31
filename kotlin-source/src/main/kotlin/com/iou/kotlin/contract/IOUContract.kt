@@ -90,7 +90,7 @@ class IOUContract : Contract {
                     requireThat { "There must be one output IOU." by (ious.outputs.size == 1) }
                     val outputIou = ious.outputs.single()
                     requireThat {
-                        "The only property which may change is 'paid'." by (inputIou.withoutPaidAmount == outputIou.withoutPaidAmount)
+                        "The only property which may change is 'paid'." by (inputIou.withoutPaidAmount() == outputIou.withoutPaidAmount())
                     }
                 }
                 requireThat {

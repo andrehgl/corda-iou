@@ -36,7 +36,7 @@ class IOUPlugin : CordaPluginRegistry() {
     override val requiredFlows = mapOf(
             IOUFlow.Initiator::class.java.name to setOf(IOUState::class.java.name, Party::class.java.name),
             SelfIssueCashFlow::class.java.name to setOf(Int::class.java.name),
-            IOUSettleFlow::class.java.name to setOf(UniqueIdentifier::class.java.name, Int::class.java.name))
+            IOUSettleFlow.Initiator::class.java.name to setOf(UniqueIdentifier::class.java.name, Int::class.java.name))
 
     /**
      * A list of long lived services to be hosted within the node. Typically you would use these to register flow
@@ -66,6 +66,7 @@ class IOUPlugin : CordaPluginRegistry() {
         // kryo.register(IOUContract.Create::class.java)
         kryo.register(Timestamp::class.java)
         kryo.register(TransactionType.General::class.java)
+        kryo.register(UniqueIdentifier::class.java)
         return true
     }
 }

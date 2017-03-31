@@ -1,6 +1,7 @@
 package com.iou.kotlin.service
 
 import com.iou.kotlin.flow.IOUFlow
+import com.iou.kotlin.flow.IOUSettleFlow
 import com.iou.kotlin.flow.IOUTransferSubflow
 import net.corda.core.node.PluginServiceHub
 
@@ -18,6 +19,7 @@ object IOUService {
     class Service(services: PluginServiceHub) {
         init {
             services.registerFlowInitiator(IOUFlow.Initiator::class) { IOUFlow.Acceptor(it) }
+            services.registerFlowInitiator(IOUSettleFlow.Initiator::class) { IOUSettleFlow.Acceptor(it) }
             services.registerFlowInitiator(IOUTransferSubflow.Initiator::class) { IOUTransferSubflow.Acceptor(it) }
         }
     }
