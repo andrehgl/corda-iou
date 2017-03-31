@@ -33,7 +33,7 @@ data class IOUState(val iouValue: Int,
         return ourKeys.intersect(participants.flatMap {it.keys}).isNotEmpty()
     }
 
-    fun pay(amount: Int) = copy(paid = amount)
+    fun pay(amount: Int) = copy(paid = paid ?.plus(amount) ?: amount)
 
     fun withoutPaidAmount(): IOUState = copy(paid = null)
 }

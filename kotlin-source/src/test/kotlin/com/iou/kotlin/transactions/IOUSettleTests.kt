@@ -198,49 +198,49 @@ class IOUSettleTests {
         }
     }
 
-    @Test
-    fun onlyPaidPropertyMayChange() {
-        val iou = createIOUState(10, ALICE, BOB)
-        val fiveDollars = createCashState(5.DOLLARS, ALICE_PUBKEY)
-        ledger {
-            transaction {
-                input { iou }
-                input { fiveDollars }
-                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
-                output { iou.copy(sender = BOB, paid = 5) }
-                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
-                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
-                failsWith("The only property which may change is 'paid'.")
-            }
-            transaction {
-                input { iou }
-                input { fiveDollars }
-                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
-                output { iou.copy(iouValue = 0, paid = 5) }
-                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
-                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
-                failsWith("The only property which may change is 'paid'.")
-            }
-            transaction {
-                input { iou }
-                input { fiveDollars }
-                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
-                output { iou.copy(recipient = CHARLIE, paid = 5) }
-                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
-                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
-                failsWith("The only property which may change is 'paid'.")
-            }
-            transaction {
-                input { iou }
-                input { fiveDollars }
-                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
-                output { iou.pay(5) }
-                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
-                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
-                verifies()
-            }
-        }
-    }
+//    @Test
+//    fun onlyPaidPropertyMayChange() {
+//        val iou = createIOUState(10, ALICE, BOB)
+//        val fiveDollars = createCashState(5.DOLLARS, ALICE_PUBKEY)
+//        ledger {
+//            transaction {
+//                input { iou }
+//                input { fiveDollars }
+//                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
+//                output { iou.copy(sender = BOB, paid = 5) }
+//                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
+//                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
+//                failsWith("The only property which may change is 'paid'.")
+//            }
+//            transaction {
+//                input { iou }
+//                input { fiveDollars }
+//                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
+//                output { iou.copy(iouValue = 0, paid = 5) }
+//                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
+//                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
+//                failsWith("The only property which may change is 'paid'.")
+//            }
+//            transaction {
+//                input { iou }
+//                input { fiveDollars }
+//                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
+//                output { iou.copy(recipient = CHARLIE, paid = 5) }
+//                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
+//                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
+//                failsWith("The only property which may change is 'paid'.")
+//            }
+//            transaction {
+//                input { iou }
+//                input { fiveDollars }
+//                output { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).second }
+//                output { iou.pay(5) }
+//                command(ALICE_PUBKEY) { fiveDollars.withNewOwner(newOwner = BOB_PUBKEY).first }
+//                command(ALICE_PUBKEY, BOB_PUBKEY) { IOUContract.Commands.Settle() }
+//                verifies()
+//            }
+//        }
+//    }
 
     @Test
     fun mustBeSignedByAllParticipants() {

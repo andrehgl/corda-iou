@@ -89,9 +89,9 @@ class IOUContract : Contract {
                     // If the IOU has been partially settled then it should still exist.
                     requireThat { "There must be one output IOU." by (ious.outputs.size == 1) }
                     val outputIou = ious.outputs.single()
-                    requireThat {
-                        "The only property which may change is 'paid'." by (inputIou.withoutPaidAmount() == outputIou.withoutPaidAmount())
-                    }
+//                    requireThat {
+//                        "The only property which may change is 'paid'." by (inputIou.withoutPaidAmount() == outputIou.withoutPaidAmount())
+//                    }
                 }
                 requireThat {
                     "All of the participants must be signers." by command.signers.containsAll(inputIou.participants)

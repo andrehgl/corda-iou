@@ -54,7 +54,7 @@ class IOUApi(private val services: CordaRPCOps) {
     @Produces(MediaType.APPLICATION_JSON)
     fun selfIssueCash(@QueryParam(value = "amount") amount: Int): Response {
         val cashState = services.startFlowDynamic(SelfIssueCashFlow::class.java, amount).returnValue.get()
-        return Response.status(Response.Status.CREATED).entity("Transaction id $cashState sent to counterparty.").build()
+        return Response.status(Response.Status.CREATED).entity(cashState.toString()).build()
     }
 
     @GET
@@ -63,7 +63,7 @@ class IOUApi(private val services: CordaRPCOps) {
     fun settleIOU(@QueryParam(value = "id") id: String,
                   @QueryParam(value = "amount") amount: Int): Response {
         val linearId = UniqueIdentifier.fromString(id)
-        val result = services.startFlowDynamic(IOUSettleFlow.Initiator::class.java, linearId, amount).returnValue.get()
-        return Response.status(Response.Status.CREATED).entity("Blah").build()
+        services.startFlowDynamic(IOUSettleFlow.Initiator::class.java, linearId, amount).returnValue.get()
+        return Response.status(Response.Status.CREATED).entity("$amount USD paid off on IOU id $id.").build()
     }
 }

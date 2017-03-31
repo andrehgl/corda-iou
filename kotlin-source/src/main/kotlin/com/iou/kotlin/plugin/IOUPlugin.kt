@@ -8,6 +8,7 @@ import com.iou.kotlin.flow.IOUSettleFlow
 import com.iou.kotlin.flow.SelfIssueCashFlow
 import com.iou.kotlin.service.IOUService
 import com.iou.kotlin.state.IOUState
+import net.corda.contracts.asset.Cash
 import net.corda.core.contracts.*
 import net.corda.core.crypto.Party
 import net.corda.core.node.CordaPluginRegistry
@@ -59,6 +60,7 @@ class IOUPlugin : CordaPluginRegistry() {
         kryo.register(IOUContract.Commands.Create::class.java)
         kryo.register(IOUContract.Commands.Transfer::class.java)
         kryo.register(IOUContract.Commands.Settle::class.java)
+        kryo.register(Cash.Commands.Move::class.java)
         kryo.register(TransactionVerificationException.ContractRejection::class.java)
         kryo.register(LedgerTransaction::class.java)
         kryo.register(AuthenticatedObject::class.java)
