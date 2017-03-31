@@ -76,7 +76,7 @@ class IOUContract : Contract {
                 }
                 // Sum the cash being sent to us (we don't care about the issuer).
                 val sumAcceptableCash = acceptableCash.sumCash().withoutIssuer().quantity.toInt()/100
-                val amountOutstanding = inputIou.iouValue - inputIou.paid!!
+                val amountOutstanding = inputIou.iouValue - inputIou.paid
                 requireThat {
                     "The amount settled cannot be more than the amount outstanding." by (amountOutstanding >= sumAcceptableCash)
                 }
@@ -89,9 +89,11 @@ class IOUContract : Contract {
                     // If the IOU has been partially settled then it should still exist.
                     requireThat { "There must be one output IOU." by (ious.outputs.size == 1) }
                     val outputIou = ious.outputs.single()
-//                    requireThat {
-//                        "The only property which may change is 'paid'." by (inputIou.withoutPaidAmount() == outputIou.withoutPaidAmount())
-//                    }
+                    requireThat {
+                        "The iou value may not change." by (inputIou.iouValue == outputIou.iouValue)
+                        "The sender may not change." by (inputIou.sender == outputIou.sender)
+                        "The recipient may not change." by (inputIou.recipient == outputIou.recipient)
+                    }
                 }
                 requireThat {
                     "All of the participants must be signers." by command.signers.containsAll(inputIou.participants)

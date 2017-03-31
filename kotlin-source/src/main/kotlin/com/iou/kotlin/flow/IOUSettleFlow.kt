@@ -21,7 +21,7 @@ object IOUSettleFlow {
 
             // Retrieve the IOU state from the vault.
             val iouStates = serviceHub.vaultService.linearHeadsOfType<IOUState>()
-            val iouToSettle = iouStates[linearId] ?: return
+            val iouToSettle = iouStates[linearId]!!
             val counterparty = iouToSettle.state.data.recipient
 
             // Create a transaction builder.
@@ -32,18 +32,30 @@ object IOUSettleFlow {
             serviceHub.vaultService.generateSpend(txBuilder, amount.DOLLARS, counterparty.owningKey)
 
             // Add the IOU states and settle command to the transaction builder.
-            val settledIOU = iouToSettle.state.data.pay(amount)
             val settleCommand = Command(
                     IOUContract.Commands.Settle(),
                     listOf(counterparty.owningKey, me.owningKey))
-            txBuilder.withItems(iouToSettle, settledIOU, settleCommand)
+
+            // Add the input IOU and IOU settle command.
+            txBuilder.addCommand(settleCommand)
+            txBuilder.addInputState(iouToSettle)
+
+            // Only add an output IOU state of the IOU has not been fully settled.
+            val amountRemaining = iouToSettle.state.data.iouValue - iouToSettle.state.data.paid - amount
+
+            if (amountRemaining > 0) {
+                val settledIOU = iouToSettle.state.data.pay(amount)
+                txBuilder.addOutputState(settledIOU)
+            }
 
             // Verify and sign the transaction.
             txBuilder.toWireTransaction().toLedgerTransaction(serviceHub).verify()
             val partSignedTx = txBuilder.signWith(serviceHub.legalIdentityKey).toSignedTransaction(false)
 
             // Get the other side's signature.
-            val signature = sendAndReceive<DigitalSignature.WithKey>(settledIOU.recipient, partSignedTx).unwrap { tx -> tx }
+            val signature = sendAndReceive<DigitalSignature.WithKey>(iouToSettle.state.data.recipient, partSignedTx).unwrap {
+                tx -> tx
+            }
             val fullySignedTx = partSignedTx + signature
 
             // Finalize the transaction.
@@ -52,12 +64,10 @@ object IOUSettleFlow {
     }
 
     class Acceptor(private val otherParty: Party) : FlowLogic<Unit>() {
-
         @Suspendable
         override fun call() {
             // Receive the signed transaction.
-            val partSignedTx = receive(SignedTransaction::class.java, otherParty)
-                    .unwrap { tx -> tx }
+            val partSignedTx = receive(SignedTransaction::class.java, otherParty).unwrap { tx -> tx }
 
             // Resolve the inputs.
             val dependencyTxIDs = partSignedTx.tx.inputs.map {it.txhash}.toSet()

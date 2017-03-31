@@ -5,6 +5,7 @@ import com.iou.kotlin.flow.IOUFlow
 import com.iou.kotlin.flow.IOUSettleFlow
 import com.iou.kotlin.flow.SelfIssueCashFlow
 import com.iou.kotlin.state.IOUState
+import net.corda.contracts.asset.Cash
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.startFlow
@@ -22,7 +23,15 @@ class IOUApi(private val services: CordaRPCOps) {
     @GET
     @Path("ious")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getIOUs() = services.vaultAndUpdates().first
+    fun getIOUs() = services.vaultAndUpdates().first.filter { it.state.data is IOUState }
+
+    /**
+     * Displays all cash states that exist in the node's vault.
+     */
+    @GET
+    @Path("cash")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getCash() = services.vaultAndUpdates().first.filter { it.state.data is Cash.State }
 
     /**
      * Initiates a flow to agree an IOU between two parties.
@@ -46,9 +55,12 @@ class IOUApi(private val services: CordaRPCOps) {
 
         return Response
                 .status(Response.Status.CREATED)
-                .entity("Transaction id ${result.id} sent to counterparty.").build()
+                .entity("Transaction id ${result.id} committed to ledger.").build()
     }
 
+    /**
+     * Helper end-point to issue some cash to ourselves.
+     */
     @GET
     @Path("self-issue-cash")
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,6 +69,9 @@ class IOUApi(private val services: CordaRPCOps) {
         return Response.status(Response.Status.CREATED).entity(cashState.toString()).build()
     }
 
+    /**
+     * Settles an IOU. Requires cash to be able to settle.
+     */
     @GET
     @Path("settle-iou")
     @Produces(MediaType.APPLICATION_JSON)

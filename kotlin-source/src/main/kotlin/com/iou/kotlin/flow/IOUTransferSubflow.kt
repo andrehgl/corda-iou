@@ -22,16 +22,15 @@ object IOUTransferSubflow {
 
         @Suspendable
         override fun call() {
-            val partSignedTx = receive(SignedTransaction::class.java, otherParty)
-                    .unwrap { tx ->
-                        // Stage 2 - Verifying the signatures
-                        val txOutputState = tx.tx.outputs[0].data as IOUState
-                        val notaryKey = serviceHub.networkMapCache.notaryNodes.single().notaryIdentity.owningKey
+            val partSignedTx = receive(SignedTransaction::class.java, otherParty).unwrap { tx ->
+                // Stage 2 - Verifying the signatures
+                val txOutputState = tx.tx.outputs[0].data as IOUState
+                val notaryKey = serviceHub.networkMapCache.notaryNodes.single().notaryIdentity.owningKey
 
-                        tx.verifySignatures(txOutputState.sender.owningKey, txOutputState.recipient.owningKey, notaryKey)
+                tx.verifySignatures(txOutputState.sender.owningKey, txOutputState.recipient.owningKey, notaryKey)
 
-                        tx
-                    }
+                tx
+            }
 
             // Stage 3 - Retrieving the transaction's dependencies.
             // We cannot call subflows within the unwrap() block.

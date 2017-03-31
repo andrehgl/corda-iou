@@ -20,7 +20,7 @@ data class IOUState(val iouValue: Int,
                     val recipient: Party,
                     override val contract: IOUContract,
                     override val linearId: UniqueIdentifier = UniqueIdentifier(),
-                    val paid: Int? = 0) : LinearState {
+                    val paid: Int = 0) : LinearState {
 
     override val participants: List<CompositeKey>
         get() = listOf(sender, recipient).map { it.owningKey }
@@ -33,7 +33,6 @@ data class IOUState(val iouValue: Int,
         return ourKeys.intersect(participants.flatMap {it.keys}).isNotEmpty()
     }
 
-    fun pay(amount: Int) = copy(paid = paid ?.plus(amount) ?: amount)
-
-    fun withoutPaidAmount(): IOUState = copy(paid = null)
+    /** Helpers to create copies of the state with an amended 'paid' property. */
+    fun pay(amount: Int) = copy(paid = paid.plus(amount))
 }

@@ -11,16 +11,14 @@ import net.corda.flows.CashFlow
 class SelfIssueCashFlow(val amount: Int) : FlowLogic<Cash.State>() {
     @Suspendable
     override fun call(): Cash.State {
-        // We create the cash issuance command.
+        /** Create the cash issue command. */
         val issueRef = OpaqueBytes.of(0)
         val notary = serviceHub.networkMapCache.notaryNodes.single().notaryIdentity
         val me = serviceHub.myInfo.legalIdentity
         val issueCashCommand = CashCommand.IssueCash(amount.DOLLARS, issueRef, me, notary)
-
-        // We create the cash issuance transaction.
+        /** Create the cash issuance transaction. */
         val cashIssueTransaction = subFlow(CashFlow(issueCashCommand))
-
-        // We return the cash output.
+        /** Return the cash output. */
         return cashIssueTransaction.tx.outputs.single().data as Cash.State
     }
 }
