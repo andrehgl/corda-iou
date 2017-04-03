@@ -3,9 +3,9 @@ package com.iou.kotlin.plugin
 import com.esotericsoftware.kryo.Kryo
 import com.iou.kotlin.api.IOUApi
 import com.iou.kotlin.contract.IOUContract
-import com.iou.kotlin.flow.IOUFlow
-import com.iou.kotlin.flow.IOUSettleFlow
-import com.iou.kotlin.flow.SelfIssueCashFlow
+import com.iou.kotlin.flow.IOUCreation.IOUCreationFlow
+import com.iou.kotlin.flow.IOUSettle.IOUSettleFlow
+import com.iou.kotlin.flow.IOUSettle.SelfIssueCashFlow
 import com.iou.kotlin.service.IOUService
 import com.iou.kotlin.state.IOUState
 import net.corda.contracts.asset.Cash
@@ -15,7 +15,7 @@ import net.corda.core.node.CordaPluginRegistry
 import net.corda.core.transactions.LedgerTransaction
 import java.util.function.Function
 
-class IOUPlugin : CordaPluginRegistry() {
+class IOUKotlinPlugin : CordaPluginRegistry() {
     /**
      * A list of classes that expose web APIs.
      */
@@ -35,7 +35,7 @@ class IOUPlugin : CordaPluginRegistry() {
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
     override val requiredFlows = mapOf(
-            IOUFlow.Initiator::class.java.name to setOf(IOUState::class.java.name, Party::class.java.name),
+            IOUCreationFlow.Initiator::class.java.name to setOf(IOUState::class.java.name, Party::class.java.name),
             SelfIssueCashFlow::class.java.name to setOf(Int::class.java.name),
             IOUSettleFlow.Initiator::class.java.name to setOf(UniqueIdentifier::class.java.name, Int::class.java.name))
 
@@ -57,9 +57,9 @@ class IOUPlugin : CordaPluginRegistry() {
     override fun registerRPCKryoTypes(kryo: Kryo): Boolean {
         kryo.register(IOUState::class.java)
         kryo.register(IOUContract::class.java)
-        kryo.register(IOUContract.Commands.Create::class.java)
-        kryo.register(IOUContract.Commands.Transfer::class.java)
-        kryo.register(IOUContract.Commands.Settle::class.java)
+        // kryo.register(IOUContract.Commands.Create::class.java)
+        // kryo.register(IOUContract.Commands.Transfer::class.java)
+        // kryo.register(IOUContract.Commands.Settle::class.java)
         kryo.register(Cash.Commands.Move::class.java)
         kryo.register(TransactionVerificationException.ContractRejection::class.java)
         kryo.register(LedgerTransaction::class.java)

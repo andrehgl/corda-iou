@@ -15,24 +15,7 @@ import java.security.PublicKey
  *
  * @param contract the contract which governs which transactions are valid for this state object.
  */
-data class IOUState(val iouValue: Int,
-                    val sender: Party,
-                    val recipient: Party,
-                    override val contract: IOUContract,
-                    override val linearId: UniqueIdentifier = UniqueIdentifier(),
-                    val paid: Int = 0) : LinearState {
+data class IOUState(override val contract: IOUContract) : ContractState {
 
-    override val participants: List<CompositeKey>
-        get() = listOf(sender, recipient).map { it.owningKey }
-
-    /**
-     * This returns true if the state should be tracked by the vault of a particular node. In this case the logic is
-     * simple; track this state if we are one of the involved parties.
-     */
-    override fun isRelevant(ourKeys: Set<PublicKey>): Boolean {
-        return ourKeys.intersect(participants.flatMap {it.keys}).isNotEmpty()
-    }
-
-    /** Helpers to create copies of the state with an amended 'paid' property. */
-    fun pay(amount: Int) = copy(paid = paid.plus(amount))
+    override val participants: List<CompositeKey> get() = listOf()
 }

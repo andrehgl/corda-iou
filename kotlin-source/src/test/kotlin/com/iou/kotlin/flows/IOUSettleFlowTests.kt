@@ -1,7 +1,7 @@
 package com.iou.kotlin.flows
 
 import com.iou.kotlin.contract.IOUContract
-import com.iou.kotlin.flow.IOUTransferFlow
+import com.iou.kotlin.flow.IOUTransfer.IOUTransferFlow
 import com.iou.kotlin.state.IOUState
 import net.corda.core.contracts.*
 import net.corda.core.getOrThrow

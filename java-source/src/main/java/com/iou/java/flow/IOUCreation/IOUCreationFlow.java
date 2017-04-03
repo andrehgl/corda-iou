@@ -1,36 +1,40 @@
-package com.iou.java.flow;
+package com.iou.java.flow.IOUCreation;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableSet;
+import com.iou.java.contract.IOUContract;
 import com.iou.java.state.IOUState;
-import net.corda.core.contracts.TransactionResolutionException;
+import net.corda.core.contracts.Command;
+import net.corda.core.contracts.TransactionType;
 import net.corda.core.crypto.CompositeKey;
+import net.corda.core.crypto.CryptoUtilities;
 import net.corda.core.crypto.DigitalSignature;
 import net.corda.core.crypto.Party;
-import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.FlowException;
 import net.corda.core.flows.FlowLogic;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.flows.ResolveTransactionsFlow;
+import net.corda.core.transactions.TransactionBuilder;
+import net.corda.core.transactions.WireTransaction;
+import net.corda.flows.FinalityFlow;
 
-import java.io.FileNotFoundException;
+import java.security.KeyPair;
 import java.security.SignatureException;
 import java.util.Set;
 
 import static kotlin.collections.CollectionsKt.single;
 
-public class IOUTransferSubflow {
-    public static class Initiator extends FlowLogic<DigitalSignature.WithKey> {
-        private final SignedTransaction stx;
+public class IOUCreationFlow {
+    public static class Initiator extends FlowLogic<SignedTransaction> {
+        private final IOUState iou;
         private final Party otherParty;
 
-        public Initiator(SignedTransaction stx, Party otherParty) {
-            this.stx = stx;
+        public Initiator(IOUState iou, Party otherParty) {
+            this.iou = iou;
             this.otherParty = otherParty;
         }
 
         @Suspendable
-        public DigitalSignature.WithKey call() throws FlowException {
+        public SignedTransaction call() {
             return null;
         }
     }
@@ -44,7 +48,7 @@ public class IOUTransferSubflow {
 
         @Suspendable
         @Override
-        public Void call() throws FlowException {
+        public Void call() {
             return null;
         }
     }

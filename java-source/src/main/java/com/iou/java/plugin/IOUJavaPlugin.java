@@ -3,8 +3,8 @@ package com.iou.java.plugin;
 import com.esotericsoftware.kryo.Kryo;
 import com.iou.java.api.IOUApi;
 import com.iou.java.contract.IOUContract;
+import com.iou.java.flow.IOUCreation.IOUCreationFlow;
 import com.iou.java.service.IOUService;
-import com.iou.java.flow.IOUFlow;
 import com.iou.java.state.IOUState;
 import net.corda.core.contracts.AuthenticatedObject;
 import net.corda.core.contracts.Timestamp;
@@ -19,7 +19,7 @@ import net.corda.core.transactions.LedgerTransaction;
 import java.util.*;
 import java.util.function.Function;
 
-public class IOUPlugin extends CordaPluginRegistry {
+public class IOUJavaPlugin extends CordaPluginRegistry {
     /**
      * A list of classes that expose web APIs.
      */
@@ -39,7 +39,7 @@ public class IOUPlugin extends CordaPluginRegistry {
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
     private final Map<String, Set<String>> requiredFlows = Collections.singletonMap(
-            IOUFlow.Initiator.class.getName(),
+            IOUCreationFlow.Initiator.class.getName(),
             new HashSet<>(Arrays.asList(
                     IOUState.class.getName(),
                     Party.class.getName()
@@ -73,6 +73,8 @@ public class IOUPlugin extends CordaPluginRegistry {
         kryo.register(AuthenticatedObject.class);
         // Uncomment once you've added the Create command constraint.
         // kryo.register(IOUContract.Create.class);
+        // Uncomment once you've added the Transfer command constraint.
+        // kryo.register(IOUContract.Commands.Transfer::class.java);
         kryo.register(Timestamp.class);
         kryo.register(TransactionType.General.class);
         return true;

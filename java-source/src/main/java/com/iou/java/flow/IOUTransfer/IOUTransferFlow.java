@@ -1,4 +1,4 @@
-package com.iou.java.flow;
+package com.iou.java.flow.IOUTransfer;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;

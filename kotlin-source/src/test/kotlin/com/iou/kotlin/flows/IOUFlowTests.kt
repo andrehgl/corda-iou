@@ -1,7 +1,7 @@
 package com.iou.kotlin.flows
 
 import com.iou.kotlin.contract.IOUContract
-import com.iou.kotlin.flow.IOUFlow
+import com.iou.kotlin.flow.IOUCreation.IOUCreationFlow
 import com.iou.kotlin.state.IOUState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.getOrThrow

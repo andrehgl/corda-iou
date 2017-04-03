@@ -1,27 +1,13 @@
 package com.iou.java.flows;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.iou.java.contract.IOUContract;
-import com.iou.java.state.IOUState;
-import com.iou.java.flow.IOUTransferFlow;
-import net.corda.core.contracts.*;
-import net.corda.core.crypto.CompositeKey;
-import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.transactions.TransactionBuilder;
 import net.corda.testing.node.MockNetwork;
 import net.corda.testing.node.MockNetwork.MockNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.List;
-
-import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY;
 import static net.corda.core.utilities.TestConstants.getDUMMY_NOTARY_KEY;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.jgroups.util.Util.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 

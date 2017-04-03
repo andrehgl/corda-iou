@@ -1,7 +1,7 @@
 package com.iou.java.service;
 
-import com.iou.java.flow.IOUFlow;
-import com.iou.java.flow.IOUTransferSubflow;
+import com.iou.java.flow.IOUCreation.IOUCreationFlow;
+import com.iou.java.flow.IOUTransfer.IOUTransferSubflow;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -18,8 +18,8 @@ import net.corda.core.node.PluginServiceHub;
 public class IOUService {
     public IOUService(PluginServiceHub services) {
         services.registerFlowInitiator(
-                JvmClassMappingKt.getKotlinClass(IOUFlow.Initiator.class),
-                IOUFlow.Acceptor::new
+                JvmClassMappingKt.getKotlinClass(IOUCreationFlow.Initiator.class),
+                IOUCreationFlow.Acceptor::new
         );
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IOUTransferSubflow.Initiator.class),
